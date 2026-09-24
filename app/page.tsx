@@ -1,69 +1,187 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useEffect, useRef, useState } from "react";
+import { Chart } from "chart.js/auto";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { NumberTicker } from "@/components/ui/number-ticker";
+import {
+  formatRupiah,
+  getRingkasanKategori,
+  getSaldo,
+  getTransaksi,
+  kategoriOf,
+  segarkanCacheProduk,
+  type RingkasKat,
+  type Saldo,
+  type Transaksi,
+} from "@/lib/db-lokal";
+import { akhirBulanIni, akhirMingguIni, awalBulanIni, awalMingguIni } from "@/lib/periode";
+
+type Periode = "semua" | "minggu" | "bulan";
+
+export default function Dashboard() {
+  const [periode, setPeriode] = useState<Periode>("semua");
+  const [saldo, setSaldo] = useState<Saldo>({ masuk: 0, keluar: 0, saldo: 0 });
+  const [kat, setKat] = useState<RingkasKat[]>([]);
+  const [riwayat, setRiwayat] = useState<Transaksi[]>([]);
+  const refArus = useRef<HTMLCanvasElement>(null);
+  const refDonat = useRef<HTMLCanvasElement>(null);
+  const charts = useRef<Chart[]>([]);
+
+  useEffect(() => {
+    let batal = false;
+    (async () => {
+      const filter =
+        periode === "minggu"
+          ? { dari: awalMingguIni(), sampai: akhirMingguIni() }
+          : periode === "bulan"
+            ? { dari: awalBulanIni(), sampai: akhirBulanIni() }
+            : undefined;
+      const [s, k, daftar] = await Promise.all([
+        getSaldo(filter),
+        getRingkasanKategori(filter),
+        getTransaksi(),
+      ]);
+      await segarkanCacheProduk();
+      if (batal) return;
+      setSaldo(s);
+      setKat(k);
+      const urut = daftar
+        .slice()
+        .sort((a, b) => (a.tanggal < b.tanggal ? 1 : a.tanggal > b.tanggal ? -1 : b.id - a.id))
+        .slice(0, 5);
+      setRiwayat(urut);
+    })();
+    return () => {
+      batal = true;
+    };
+  }, [periode]);
+
+  useEffect(() => {
+    charts.current.forEach((c) => c.destroy());
+    charts.current = [];
+    if (saldo.masuk === 0 && saldo.keluar === 0) return;
+    if (typeof window === "undefined") return;
+    const gelap = document.documentElement.classList.contains("dark");
+    const ticks = gelap ? "#93a89e" : "#6b7280";
+    if (refArus.current)
+      charts.current.push(
+        new Chart(refArus.current, {
+          type: "bar",
+          data: {
+            labels: ["Masuk", "Keluar"],
+            datasets: [{ data: [saldo.masuk, saldo.keluar], backgroundColor: ["#059669", "#dc2626"], borderRadius: 8 }],
+          },
+          options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { color: ticks } }, x: { ticks: { color: ticks } } } },
+        })
+      );
+    if (refDonat.current && kat.length > 0)
+      charts.current.push(
+        new Chart(refDonat.current, {
+          type: "doughnut",
+          data: {
+            labels: kat.map((r) => r.kategori),
+            datasets: [{ data: kat.map((r) => r.total), backgroundColor: ["#059669", "#10b981", "#34d399", "#f59e0b", "#3b82f6"] }],
+          },
+          options: { plugins: { legend: { position: "bottom" } } },
+        })
+      );
+    return () => {
+      charts.current.forEach((c) => c.destroy());
+      charts.current = [];
+    };
+  }, [saldo, kat]);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <main className="mx-auto w-full max-w-6xl space-y-6 p-4 pb-16 md:p-8">
+      <div className="flex flex-wrap items-center gap-3">
+        <h1 className="text-3xl font-bold">Dashboard</h1>
+        <Badge variant="secondary">Offline • Perangkat ini</Badge>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <Card>
+          <CardContent className="pt-4">
+            <p className="text-xs text-muted-foreground">Total masuk</p>
+            <p className="text-2xl font-bold text-emerald-600 tabular-nums dark:text-emerald-400">
+              Rp<NumberTicker value={saldo.masuk} />
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-4">
+            <p className="text-xs text-muted-foreground">Total keluar</p>
+            <p className="text-2xl font-bold text-red-600 tabular-nums dark:text-red-400">
+              Rp<NumberTicker value={saldo.keluar} />
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+      <Card className="bg-emerald-700 text-white dark:bg-emerald-900">
+        <CardContent className="pt-4">
+          <p className="text-sm opacity-85">Saldo</p>
+          <p className="text-4xl font-bold tabular-nums">
+            Rp<NumberTicker value={saldo.saldo} />
           </p>
+        </CardContent>
+      </Card>
+      <div className="flex gap-2">
+        {(["semua", "minggu", "bulan"] as Periode[]).map((p) => (
+          <Button key={p} variant={periode === p ? "default" : "secondary"} onClick={() => setPeriode(p)}>
+            {p === "semua" ? "Semua Waktu" : p === "minggu" ? "Minggu Ini" : "Bulan Ini"}
+          </Button>
+        ))}
+      </div>
+      <Card>
+        <CardHeader><CardTitle>Keluar per Kategori</CardTitle></CardHeader>
+        <CardContent>
+          {kat.length === 0 ? (
+            <p className="text-sm text-muted-foreground">Belum ada pengeluaran pada periode ini.</p>
+          ) : (
+            <ul className="space-y-2">
+              {kat.map((r) => (
+                <li key={r.kategori} className="flex justify-between text-sm">
+                  <span>{r.kategori}</span>
+                  <span className="tabular-nums">Rp{formatRupiah(r.total)} ({r.persen}%)</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
+      {saldo.masuk === 0 && saldo.keluar === 0 ? (
+        <p className="text-sm text-muted-foreground">Silakan input data terlebih dahulu untuk menampilkan grafik.</p>
+      ) : (
+        <div className="grid gap-6 md:grid-cols-2">
+          <Card><CardContent className="pt-4"><canvas ref={refArus} height={220} /></CardContent></Card>
+          {kat.length > 0 && (
+            <Card><CardContent className="pt-4"><canvas ref={refDonat} height={220} /></CardContent></Card>
+          )}
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+      )}
+      <Card>
+        <CardHeader><CardTitle>Terakhir dicatat</CardTitle></CardHeader>
+        <CardContent>
+          {riwayat.length === 0 ? (
+            <p className="text-sm text-muted-foreground">Belum ada transaksi.</p>
+          ) : (
+            <ul className="space-y-2">
+              {riwayat.map((t) => (
+                <li key={t.id} className="flex items-center gap-2 text-sm">
+                  <Badge variant={t.jenis === "masuk" ? "default" : "destructive"}>
+                    {t.jenis === "masuk" ? "MASUK" : "KELUAR"}
+                  </Badge>
+                  <span className="min-w-0 flex-1 truncate">
+                    {kategoriOf(t)} • {t.tanggal}
+                  </span>
+                  <strong className="tabular-nums">Rp{formatRupiah(t.jumlah)}</strong>
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
+    </main>
   );
 }
