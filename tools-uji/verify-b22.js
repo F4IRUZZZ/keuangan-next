@@ -73,8 +73,10 @@ const lapor = (n, ok, d) => {
     );
     await page.getByLabel("Pilih semua yang tampil").check();
     await page.getByRole("button", { name: /Hapus terpilih/ }).click();
+    await page.waitForSelector('[role="dialog"]', { timeout: 8000 });
+    await page.locator('[role="dialog"]').getByRole("button", { name: "Hapus" }).click();
     await page.waitForFunction(() => /2 transaksi dihapus/.test(document.body.textContent ?? ""), null, { timeout: 10000 });
-    lapor("bulk hapus 2 + cascade", true);
+    lapor("bulk dialog + hapus 2 + cascade", true);
     // F1.2: preset URL + reset + filter hari + CSV + footer + limit + mini-stat
     await page.goto(`${BASE}/transaksi?jenis=keluar`, { waitUntil: "load", timeout: 120000 });
     await page.waitForFunction(() => {

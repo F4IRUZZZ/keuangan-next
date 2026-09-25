@@ -77,6 +77,7 @@ function IsiTransaksi() {
   const [ubahKat, setUbahKat] = useState("");
   const [ubahPesan, setUbahPesan] = useState("");
   const [hapusId, setHapusId] = useState<number | null>(null);
+  const [konfirmBulk, setKonfirmBulk] = useState(false);
   const refCari = useRef<HTMLInputElement>(null);
 
   async function muat() {
@@ -168,7 +169,7 @@ function IsiTransaksi() {
 
   async function hapusMassal() {
     if (terpilih.size === 0) return;
-    if (!window.confirm(`Hapus ${terpilih.size} transaksi terpilih?`)) return;
+    setKonfirmBulk(false);
     let ok = 0;
     const gagal: number[] = [];
     for (const id of Array.from(terpilih)) {
@@ -441,6 +442,25 @@ function IsiTransaksi() {
             <Button variant="secondary" size="sm" onClick={unduhCSVToolbar}>
               CSV
             </Button>
+            <label className="flex items-center gap-1 text-sm text-muted-foreground">
+              <input
+                type="checkbox"
+                className="size-5 accent-emerald-600"
+                aria-label="Pilih semua yang tampil"
+                checked={data.length > 0 && data.every((t) => terpilih.has(t.id))}
+                onChange={(e) => {
+                  setTerpilih((s) => {
+                    const n = new Set(s);
+                    for (const t of data) {
+                      if (e.target.checked) n.add(t.id);
+                      else n.delete(t.id);
+                    }
+                    return n;
+                  });
+                }}
+              />
+              Pilih semua
+            </label>
           </div>
           <Input
             ref={refCari}
@@ -451,7 +471,7 @@ function IsiTransaksi() {
           {!terpilih.size ? null : (
             <div className="flex items-center gap-2 rounded-xl border p-2 text-sm">
               <span>{terpilih.size} terpilih.</span>
-              <Button variant="destructive" size="sm" onClick={hapusMassal}>Hapus terpilih</Button>
+              <Button variant="destructive" size="sm" onClick={() => setKonfirmBulk(true)}>Hapus terpilih</Button>
             </div>
           )}
           {urut.length === 0 ? (
@@ -505,25 +525,6 @@ function IsiTransaksi() {
               : `Subtotal: Rp${formatRupiah(subtotal)}`}{" "}
             - Menampilkan {data.length} dari {daftar.length} catatan
           </p>
-          <label className="flex items-center gap-2 text-sm text-muted-foreground">
-            <input
-              type="checkbox"
-              className="size-5 accent-emerald-600"
-              aria-label="Pilih semua yang tampil"
-              checked={data.length > 0 && data.every((t) => terpilih.has(t.id))}
-              onChange={(e) => {
-                setTerpilih((s) => {
-                  const n = new Set(s);
-                  for (const t of data) {
-                    if (e.target.checked) n.add(t.id);
-                    else n.delete(t.id);
-                  }
-                  return n;
-                });
-              }}
-            />
-            Pilih semua yang tampil
-          </label>
         </section>
       </div>
       <Link href="/pengaturan" className="text-sm font-semibold text-muted-foreground underline">
@@ -571,6 +572,19 @@ function IsiTransaksi() {
           <DialogFooter>
             <Button variant="secondary" onClick={() => setHapusId(null)}>Batal</Button>
             <Button variant="destructive" onClick={jalankanHapus}>Hapus</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={konfirmBulk} onOpenChange={setKonfirmBulk}>
+        <DialogContent aria-label="Hapus transaksi terpilih">
+          <DialogHeader>
+            <DialogTitle>Hapus {terpilih.size} transaksi terpilih?</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">Catatan yang menempel ikut terhapus. Tindakan ini tidak bisa dibatalkan.</p>
+          <DialogFooter>
+            <Button variant="secondary" onClick={() => setKonfirmBulk(false)}>Batal</Button>
+            <Button variant="destructive" onClick={hapusMassal}>Hapus</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
