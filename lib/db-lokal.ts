@@ -654,3 +654,60 @@ export async function hapusSemuaData(): Promise<void> {
 export function formatRupiah(n: number): string {
   return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 }
+
+// --- Batas harian: 1 angka di localStorage. Belum diatur = 500rb; 0 = sembunyi.
+export function getBatasHarian(): number {
+  try {
+    const mentah = window.localStorage.getItem("batasHarian");
+    if (mentah === null || mentah === "") return 500000;
+    return Number(mentah) || 0;
+  } catch {
+    return 500000;
+  }
+}
+
+export function setBatasHarian(v: number): void {
+  try {
+    window.localStorage.setItem("batasHarian", String(Number(v) || 0));
+  } catch {
+    /* abaikan */
+  }
+}
+
+function selCSV(teks: unknown): string {
+  return `"${String(teks).replace(/"/g, '""')}"`;
+}
+
+// --- Ekspor CSV seluruh data perangkat (dipakai toolbar Transaksi + Pengaturan).
+export async function eksporCSV(): Promise<string> {
+  const [produk, transaksi, catatan] = await Promise.all([
+    dbSemua<Produk>("produk"),
+    getTransaksi(),
+    muatSemuaCatatan(),
+  ]);
+  const katOf = (t: Transaksi): string => {
+    if (t.kategori) return t.kategori;
+    const p = produk.find((x) => x.id === t.produkId);
+    return p ? p.kategori : "Lainnya";
+  };
+  const baris = ["tanggal,jenis,jumlah,kategori,catatan"];
+  for (const t of transaksi) {
+    const notes = catatan
+      .filter((c) => c.transaksiId === t.id)
+      .map((c) => c.isi)
+      .join("; ");
+    baris.push(
+      [selCSV(t.tanggal), selCSV(t.jenis), t.jumlah, selCSV(katOf(t)), selCSV(notes)].join(",")
+    );
+  }
+  return baris.join("\r\n");
+}
+
+export function unduhFile(nama: string, teks: string, tipe: string): void {
+  const blob = new Blob([teks], { type: tipe });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = nama;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}

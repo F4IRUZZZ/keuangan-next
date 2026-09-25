@@ -1,12 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import {
+  formatRupiah,
+  getBatasHarian,
   hapusSemuaData,
   imporBackup,
+  setBatasHarian,
   tanggalHariIni,
 } from "@/lib/db-lokal";
 
@@ -38,6 +42,18 @@ function selCSV(teks: unknown): string {
 
 export default function PengaturanPage() {
   const [hasil, setHasil] = useState("");
+  const [batasTeks, setBatasTeks] = useState("");
+
+  useEffect(() => {
+    const kini = getBatasHarian();
+    if (kini > 0) setBatasTeks(formatRupiah(kini));
+  }, []);
+
+  function simpanBatas() {
+    const v = Number(batasTeks.replace(/[^0-9]/g, "")) || 0;
+    setBatasHarian(v);
+    setHasil(v > 0 ? `Batas disimpan: Rp${formatRupiah(v)} per hari.` : "Kartu limit disembunyikan (batas 0).");
+  }
 
   async function eksporCSV() {
     const { produk, transaksi, catatan } = await bacaSemua();
@@ -113,6 +129,19 @@ export default function PengaturanPage() {
               className="text-sm"
             />
           </div>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader><CardTitle>Batas Pengeluaran Harian</CardTitle></CardHeader>
+        <CardContent className="space-y-3">
+          <div>
+            <label className="mb-1 block text-sm font-medium" htmlFor="batas">Batas per hari (Rp, 0 = sembunyikan kartu)</label>
+            <Input id="batas" inputMode="numeric" value={batasTeks} onChange={(e) => {
+              const digit = e.target.value.replace(/[^0-9]/g, "").slice(0, 15);
+              setBatasTeks(digit ? formatRupiah(Number(digit)) : "");
+            }} />
+          </div>
+          <Button onClick={simpanBatas}>Simpan Batas</Button>
         </CardContent>
       </Card>
       <Card>
