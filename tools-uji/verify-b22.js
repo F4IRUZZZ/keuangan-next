@@ -38,8 +38,20 @@ const lapor = (n, ok, d) => {
     if (chipNol !== "5.000") throw new Error("chip +000 gagal: " + chipNol);
     lapor("chips +10rb/+00/+000 format", true);
     await page.locator("#tab-form").getByRole("tab", { name: /^Keluar/ }).click();
+    // Dropdown custom (pengganti datalist): buka -> ketik -> + Tambah
+    async function pilihKategoriBaru(teks) {
+      await page.click("#kombo-kat");
+      await page.waitForSelector('[role="listbox"]', { timeout: 8000 });
+      await page.fill('input[aria-label="Cari kategori"]', teks);
+      await page.getByRole("button", { name: `+ Tambah "${teks}"` }).click();
+      await page.waitForFunction(
+        (t) => document.getElementById("kombo-kat")?.textContent?.includes(t),
+        teks,
+        { timeout: 8000 }
+      );
+    }
     await page.fill("#jml", "13000");
-    await page.fill("#kat", "TesUbah");
+    await pilihKategoriBaru("TesUbah");
     await page.click('button[type="submit"]');
     await page.waitForFunction(() => /tercatat/.test(document.body.textContent ?? ""), null, { timeout: 10000 });
     // Dialog ubah: ganti jumlah -> simpan
@@ -56,11 +68,37 @@ const lapor = (n, ok, d) => {
     await page.waitForFunction(() => /dihapus\./.test(document.body.textContent ?? ""), null, { timeout: 10000 });
     await page.waitForFunction(() => !/TesUbah/.test(document.body.textContent ?? ""), null, { timeout: 10000 });
     lapor("dialog hapus konfirmasi", true);
-    // Tulis 2 baris TesBulk untuk dihapus massal
+    // Dropdown: Esc menutup panel; pilih opsi existing
+    await page.click("#kombo-kat");
+    await page.waitForSelector('[role="listbox"]', { timeout: 8000 });
+    await page.keyboard.press("Escape");
+    await page.waitForFunction(() => !document.querySelector('[role="listbox"]'), null, { timeout: 8000 });
+    // Buat kategori TesOpt via +Tambah agar jadi opsi, lalu pilih opsinya
+    await page.fill("#jml", "1000");
+    await pilihKategoriBaru("TesOpt");
+    await page.click('button[type="submit"]');
+    await page.waitForFunction(() => /tercatat/.test(document.body.textContent ?? ""), null, { timeout: 10000 });
+    await page.click("#kombo-kat");
+    await page.waitForSelector('[role="listbox"]', { timeout: 8000 });
+    await page.getByRole("button", { name: /^TesOpt$/ }).click();
+    const komboLabel = await page.$eval("#kombo-kat", (el) => el.textContent ?? "");
+    if (!komboLabel.includes("TesOpt")) throw new Error("pilih opsi gagal");
+    lapor("dropdown pilih + Esc", true);
+    async function pilihKategoriLoop(teks) {
+      await page.click("#kombo-kat");
+      await page.waitForSelector('[role="listbox"]', { timeout: 8000 });
+      await page.fill('input[aria-label="Cari kategori"]', teks);
+      const tambah = page.getByRole("button", { name: `+ Tambah "${teks}"` });
+      if ((await tambah.count()) > 0) {
+        await tambah.click();
+      } else {
+        await page.getByRole("button", { name: new RegExp("^" + teks + "$") }).first().click();
+      }
+    }
     for (const nominal of ["11000", "12000"]) {
       await page.locator("#tab-form").getByRole("tab", { name: /^Keluar/ }).click();
       await page.fill("#jml", nominal);
-      await page.fill("#kat", "TesBulk");
+      await pilihKategoriLoop("TesBulk");
       await page.click('button[type="submit"]');
       await page.waitForFunction(() => /tercatat/.test(document.body.textContent ?? ""), null, { timeout: 10000 });
     }

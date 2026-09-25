@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DialogCatatan } from "@/components/dialog-catatan";
+import { DropdownKategori } from "@/components/dropdown-kategori";
 import {
   Dialog,
   DialogContent,
@@ -352,22 +353,14 @@ function IsiTransaksi() {
                   </div>
                 </div>
                 {jenis === "keluar" && (
-                  <div>
-                    <label className="mb-1 block text-sm font-medium" htmlFor="kat">Untuk apa?</label>
-                    <Input
-                      id="kat"
-                      list="saran-kat"
-                      placeholder="contoh: Makan / Beras / Parkir"
-                      autoComplete="off"
-                      value={kategori}
-                      onChange={(e) => setKategori(e.target.value)}
-                    />
-                    <datalist id="saran-kat">
-                      {saran.map((s) => (
-                        <option key={s} value={s} />
-                      ))}
-                    </datalist>
-                  </div>
+                  <DropdownKategori
+                    id="kombo-kat"
+                    label="Untuk apa?"
+                    placeholder="contoh: Makan / Beras / Parkir"
+                    value={kategori}
+                    onPilih={setKategori}
+                    saran={saran}
+                  />
                 )}
                 <div>
                   <label className="mb-1 block text-sm font-medium" htmlFor="tgl">Tanggal</label>
@@ -569,10 +562,14 @@ function IsiTransaksi() {
               }} />
             </div>
             {daftar.find((t) => t.id === ubahId)?.jenis === "keluar" && (
-              <div>
-                <label className="mb-1 block text-sm font-medium" htmlFor="u-kat">Kategori baru</label>
-                <Input id="u-kat" value={ubahKat} onChange={(e) => setUbahKat(e.target.value)} />
-              </div>
+              <DropdownKategori
+                id="kombo-kat-baru"
+                label="Kategori baru"
+                placeholder="Pilih atau ketik baru"
+                value={ubahKat}
+                onPilih={setUbahKat}
+                saran={saran}
+              />
             )}
             {ubahPesan && <p className="text-sm font-semibold text-red-600 dark:text-red-400">{ubahPesan}</p>}
           </div>

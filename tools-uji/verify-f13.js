@@ -114,12 +114,12 @@ const lapor = (n, ok, d) => {
     await langkah("fillPihakH", () => page.fill("#pihak", "ArahH"));
     await langkah("fillJmlH", () => page.fill("#jml-hutang", "30000"));
     await langkah("submitH", () => page.click('button[type="submit"]'));
-    await langkah("waitArahH", () => page.waitForFunction(() => /ArahH/.test(document.body.textContent ?? ""), null, { timeout: 30000 }));
+    await langkah("waitArahH", () => page.waitForFunction(() => /ArahH/.test(document.body.textContent ?? ""), null, { polling: 100, timeout: 30000 }));
     await langkah("tabPiutang", () => page.locator("#tab-arah").getByRole("tab", { name: /^Piutang/ }).click());
     await langkah("fillPihakP", () => page.fill("#pihak", "ArahP"));
     await langkah("fillJmlP", () => page.fill("#jml-hutang", "70000"));
     await langkah("submitP", () => page.click('button[type="submit"]'));
-    await langkah("waitArahP", () => page.waitForFunction(() => /ArahP/.test(document.body.textContent ?? ""), null, { timeout: 30000 }));
+    await langkah("waitArahP", () => page.waitForFunction(() => /ArahP/.test(document.body.textContent ?? ""), null, { polling: 100, timeout: 30000 }));
     // Subtotal riil: hutang = Budi 0 + Rincian 50000 + ArahH 30000 = 80000
     await langkah("assertGabung", () => page.waitForFunction(() => {
       const t = document.body.textContent ?? "";
