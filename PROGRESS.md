@@ -32,7 +32,7 @@
 ## F1 — Logika & fitur sampai paritas (JALAN SEKARANG)
 
 - [x] F1.1: catatan inline per transaksi (PR #6 merged)
-- [ ] F1.2: limit harian + setting + mini-stat bulan + preset ?jenis + reset + filter Hari/Bulan + CSV toolbar + footer hitung
+- [~] F1.2: limit harian + setting + mini-stat bulan + preset ?jenis + reset + filter Hari/Bulan + CSV toolbar + footer hitung (PR #8, uji 11/11 hijau)
 - [ ] F1.3: hutang tulis/bayar/lunas/hapus + progress + tempo (= B2.3 lama, pindah ke sini)
 - [ ] F1.4: produk CRUD + hitung pakai (= sisa B2.3)
 - [ ] F1.5: dashboard riwayat ringkas + grafik mingguan
