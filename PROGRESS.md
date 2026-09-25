@@ -32,7 +32,7 @@
 ## F1 — Logika & fitur sampai paritas (JALAN SEKARANG)
 
 - [x] F1.1: catatan inline per transaksi (PR #6 merged)
-- [~] F1.2: limit harian + setting + mini-stat bulan + preset ?jenis + reset + filter Hari/Bulan + CSV toolbar + footer hitung (PR #8, uji 11/11 hijau)
+- [x] F1.2: limit harian + setting + mini-stat bulan + preset ?jenis + reset + filter Hari/Bulan + CSV toolbar + footer hitung + pilih-semua toolbar + Dialog bulk (PR #8 merged)
 - [ ] F1.3: hutang tulis/bayar/lunas/hapus + progress + tempo (= B2.3 lama, pindah ke sini)
 - [ ] F1.4: produk CRUD + hitung pakai (= sisa B2.3)
 - [ ] F1.5: dashboard riwayat ringkas + grafik mingguan
@@ -81,6 +81,7 @@ _Belum ada usulan._
 
 | Tanggal | Perubahan | Uji | PR |
 |---|---|---|---|
+| 2026-09-25 | F1.2 merged: sisa fitur transaksi + pilih-semua toolbar + Dialog bulk | B22 11/11, tsc, build | #8 |
 | 2026-09-25 | F1.1 merged: Dialog catatan inline per transaksi | F11 4/4, tsc, build | #6 |
 | 2026-09-25 | B2.2b merged: chips +00/+000 + nav bawah + font Geist | B22 6/6, viewport, tsc, build | #4 |
 | 2026-09-25 | Rapikan PROGRESS (B2.3/B2.4 pindah F1, samakan checkbox) + phasing F1–F4 | - (docs) | - |
