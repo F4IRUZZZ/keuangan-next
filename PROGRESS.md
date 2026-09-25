@@ -6,31 +6,28 @@
 
 ## Legenda
 
-- [x] selesai + teruji + termerge · [ ] belum · [~] jalan sekarang
+- [X] selesai + teruji + termerge · [ ] belum · [~] jalan sekarang
 
 ## A. Fondasi eksperimen (selesai)
 
-- [x] C2: scaffold Next 16 + Tailwind + shadcn + dock/number-ticker + build hijau
-- [x] C3: halaman transaksi dummy terang/gelap + banding vs vanilla
-- [x] Struktur rapi: bukti/ gitignore, tools-uji/, README ringkas
+- [X] C2: scaffold Next 16 + Tailwind + shadcn + dock/number-ticker + build hijau
+- [X] C3: halaman transaksi dummy terang/gelap + banding vs vanilla
+- [X] Struktur rapi: bukti/ gitignore, tools-uji/, README ringkas
 
 ## B. Rewrite
 
 ### B1 — Data + 5 halaman baca (selesai)
 
-- [x] lib/db-lokal.ts (kontrak = vanilla) + window guard
-- [x] Dashboard + grafik, Transaksi, Produk, Hutang, Pengaturan (CSV/backup/restore/reset)
-- [x] Migrasi backup vanilla → angka identik (B1-ALL-OK + 5 screenshot)
+- [X] lib/db-lokal.ts (kontrak = vanilla) + window guard
+- [X] Dashboard + grafik, Transaksi, Produk, Hutang, Pengaturan (CSV/backup/restore/reset)
+- [X] Migrasi backup vanilla → angka identik (B1-ALL-OK + 5 screenshot)
 
 ### B2 — Form tulis
 
-- [x] B2.1: form transaksi → db + validasi (B21-ALL-OK)
-- [x] B2.2: bulk + format live + Dialog ubah/hapus (B22-ALL-OK, PR #2)
+- [X] B2.1: form transaksi → db + validasi (B21-ALL-OK)
+- [X] B2.2: bulk + format live + Dialog ubah/hapus (B22-ALL-OK, PR #2)
 
 - [~] B2.2b: chips +0/+00 + format otomatis chips (PR #4, uji 6/6 hijau)
-
-- [ ] B2.3: hutang tulis + produk CRUD → pindah ke F1.3/F1.4 di bawah
-- [ ] B2.4: validasi UX + uji gabungan → melebur (validasi per F1.x, gabungan = kriteria F1)
 
 ## F1 — Logika & fitur sampai paritas (JALAN SEKARANG)
 
@@ -82,15 +79,15 @@ _Belum ada usulan._
 
 ## F. Riwayat Perubahan (per PR/commit fitur, terbaru di atas)
 
-| Tanggal | Perubahan | Uji | PR |
-|---|---|---|---|
-| 2026-09-25 | Rapikan PROGRESS (B2.3/B2.4 pindah F1, samakan checkbox) + phasing F1–F4 | - (docs) | - |
-| 2026-09-25 | Nav bawah HP/tablet + font Geist + padding konten | viewport 390/1280, console bersih | #4 |
-| 2026-09-25 | B2.2b chips +0/+00→+00/+000 + format 1 pintu | B22 6/6, tsc, build | #4 |
-| 2026-09-25 | PROGRESS.md dibuat (status + B5 + backlog) | - (docs) | - |
-| 2026-09-25 | B2.2 bulk + format live + Dialog ubah/hapus | B22 5/5, tsc, build | #2 |
-| 2026-09-25 | Rapikan struktur (bukti/, tools-uji/, README) | verify-b22 hijau pasca-rename | - |
-| 2026-09-25 | B2.1 form transaksi → db + validasi | B21 4/4 | - |
-| 2026-09-24 | B1 port db-lokal TS + 5 halaman baca + migrasi backup identik | B1-ALL-OK, 5 screenshot | - |
-| 2026-09-24 | C3 halaman transaksi dummy + banding vs vanilla | screenshot terang/gelap | - |
-| 2026-09-24 | C2 scaffold Next + shadcn + dock/number-ticker | tsc + build | - |
+| Tanggal    | Perubahan                                                                 | Uji                               | PR |
+| ---------- | ------------------------------------------------------------------------- | --------------------------------- | -- |
+| 2026-09-25 | Rapikan PROGRESS (B2.3/B2.4 pindah F1, samakan checkbox) + phasing F1–F4 | - (docs)                          | -  |
+| 2026-09-25 | Nav bawah HP/tablet + font Geist + padding konten                         | viewport 390/1280, console bersih | #4 |
+| 2026-09-25 | B2.2b chips +0/+00→+00/+000 + format 1 pintu                             | B22 6/6, tsc, build               | #4 |
+| 2026-09-25 | PROGRESS.md dibuat (status + B5 + backlog)                                | - (docs)                          | -  |
+| 2026-09-25 | B2.2 bulk + format live + Dialog ubah/hapus                               | B22 5/5, tsc, build               | #2 |
+| 2026-09-25 | Rapikan struktur (bukti/, tools-uji/, README)                             | verify-b22 hijau pasca-rename     | -  |
+| 2026-09-25 | B2.1 form transaksi → db + validasi                                      | B21 4/4                           | -  |
+| 2026-09-24 | B1 port db-lokal TS + 5 halaman baca + migrasi backup identik             | B1-ALL-OK, 5 screenshot           | -  |
+| 2026-09-24 | C3 halaman transaksi dummy + banding vs vanilla                           | screenshot terang/gelap           | -  |
+| 2026-09-24 | C2 scaffold Next + shadcn + dock/number-ticker                            | tsc + build                       | -  |
