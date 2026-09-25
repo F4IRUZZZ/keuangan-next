@@ -1,6 +1,6 @@
 // Verifikasi B2.1: tulis via form transaksi Next -> db-lokal.
 const { spawn } = require("child_process");
-const { chromium } = require("D:\\Project Developments\\Webapp Keuangan\\tools\\uji\\node_modules\\playwright-core");
+const { chromium } = require("D:\\Project Developments\\GITHUB\\Webapp Keuangan(Ga Tuntas)\\tools\\uji\\node_modules\\playwright-core");
 
 const PORT = Number(process.env.UJI_PORT || 3003);
 const BASE = `http://localhost:${PORT}`;

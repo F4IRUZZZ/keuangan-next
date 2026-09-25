@@ -1,6 +1,6 @@
 // Screenshot bukti C2: halaman bawaan + demo 2 komponen 21st/shadcn.
 const { spawn } = require("child_process");
-const { chromium } = require("D:\\Project Developments\\Webapp Keuangan\\tools\\uji\\node_modules\\playwright-core");
+const { chromium } = require("D:\\Project Developments\\GITHUB\\Webapp Keuangan(Ga Tuntas)\\tools\\uji\\node_modules\\playwright-core");
 
 (async () => {
   const srv = spawn("npm", ["run", "dev", "--", "--port", "3001"], {
@@ -23,10 +23,10 @@ const { chromium } = require("D:\\Project Developments\\Webapp Keuangan\\tools\\
   try {
     await page.goto("http://localhost:3001/", { waitUntil: "load" });
     await page.waitForTimeout(1500);
-    await page.screenshot({ path: "bukti-next-bawaan.png" });
+    await page.screenshot({ path: "bukti/bukti-next-bawaan.png" });
     await page.goto("http://localhost:3001/coba-komponen", { waitUntil: "load" });
     await page.waitForTimeout(2000);
-    await page.screenshot({ path: "bukti-next-komponen.png" });
+    await page.screenshot({ path: "bukti/bukti-next-komponen.png" });
     console.log("SCREENSHOT-OK errs=" + errs.length);
     if (errs.length) console.log(errs.slice(0, 3).join(" | "));
   } finally {

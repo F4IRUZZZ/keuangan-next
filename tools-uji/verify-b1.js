@@ -1,11 +1,11 @@
 // Verifikasi B1: restore backup vanilla -> banding angka -> screenshot 5 rute.
 const { spawn } = require("child_process");
 const path = require("path");
-const { chromium } = require("D:\\Project Developments\\Webapp Keuangan\\tools\\uji\\node_modules\\playwright-core");
+const { chromium } = require("D:\\Project Developments\\GITHUB\\Webapp Keuangan(Ga Tuntas)\\tools\\uji\\node_modules\\playwright-core");
 
 const PORT = 3002;
 const BASE = `http://localhost:${PORT}`;
-const BACKUP = "D:\\Project Developments\\Webapp Keuangan\\migrasi\\backup-server.json";
+const BACKUP = "D:\\Project Developments\\GITHUB\\Webapp Keuangan(Ga Tuntas)\\migrasi\\backup-server.json";
 const hasil = [];
 const lapor = (n, ok, d) => {
   hasil.push(ok);
@@ -58,7 +58,7 @@ const lapor = (n, ok, d) => {
     for (const [nama, url] of [["dash", "/"], ["trx", "/transaksi"], ["prd", "/produk"], ["htg", "/hutang"], ["set", "/pengaturan"]]) {
       await page.goto(`${BASE}${url}`, { waitUntil: "load", timeout: 60000 });
       await page.waitForTimeout(800);
-      await page.screenshot({ path: `bukti-b1-${nama}.png` });
+      await page.screenshot({ path: `bukti/bukti-b1-${nama}.png` });
     }
     lapor("screenshot 5 rute", true);
     const serius = errs.filter((m) => !/favicon/i.test(m));

@@ -1,6 +1,6 @@
 // Bukti C3: screenshot Next /transaksi (terang+gelap) vs vanilla /transaksi.
 const { spawn } = require("child_process");
-const { chromium } = require("D:\\Project Developments\\Webapp Keuangan\\tools\\uji\\node_modules\\playwright-core");
+const { chromium } = require("D:\\Project Developments\\GITHUB\\Webapp Keuangan(Ga Tuntas)\\tools\\uji\\node_modules\\playwright-core");
 
 async function tunggu(url) {
   const t0 = Date.now();
@@ -17,7 +17,7 @@ async function tunggu(url) {
 (async () => {
   const next = spawn("npm", ["run", "dev", "--", "--port", "3001"], { cwd: __dirname + "\\..", shell: true });
   const van = spawn("bun", ["run", "tools/depan.ts"], {
-    cwd: "D:\\Project Developments\\Webapp Keuangan",
+    cwd: "D:\\Project Developments\\GITHUB\\Webapp Keuangan(Ga Tuntas)",
     env: Object.assign({}, process.env, { WEB_PORT: "5598" }),
     shell: true,
   });
@@ -34,16 +34,16 @@ async function tunggu(url) {
     await page.waitForSelector("h1", { timeout: 120000 });
     await page.waitForTimeout(2500);
     await page.$eval("#list-atau-form", (el) => el && el.scrollIntoView()).catch(() => {});
-    await page.screenshot({ path: "bukti-next-transaksi-terang.png" });
+    await page.screenshot({ path: "bukti/bukti-next-transaksi-terang.png" });
     const tema = await page.$('button[aria-label="Ganti tema"]');
     if (tema) {
       await tema.click();
       await page.waitForTimeout(800);
-      await page.screenshot({ path: "bukti-next-transaksi-gelap.png" });
+      await page.screenshot({ path: "bukti/bukti-next-transaksi-gelap.png" });
     }
     await page.goto("http://localhost:5598/transaksi", { waitUntil: "load", timeout: 60000 });
     await page.waitForTimeout(1500);
-    await page.screenshot({ path: "bukti-vanilla-transaksi.png" });
+    await page.screenshot({ path: "bukti/bukti-vanilla-transaksi.png" });
     console.log("BANDING-OK errs=" + errs.length);
     if (errs.length) console.log(errs.slice(0, 3).join(" | "));
   } finally {
