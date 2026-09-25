@@ -20,7 +20,7 @@
 ### B2 — Form tulis
 - [x] B2.1: form transaksi → db + validasi (B21-ALL-OK)
 - [x] B2.2: bulk + format live + Dialog ubah/hapus (B22-ALL-OK, PR #2)
-- [ ] B2.2b: chips +0/+00 + format otomatis chips (rencana siap)
+- [~] B2.2b: chips +0/+00 + format otomatis chips (PR #4, uji 6/6 hijau)
 - [ ] B2.3: hutang tulis + produk CRUD
 - [ ] B2.4: validasi UX + uji gabungan + screenshot
 
