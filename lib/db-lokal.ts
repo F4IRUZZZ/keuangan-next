@@ -680,6 +680,15 @@ export function formatRupiah(n: number): string {
   return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 }
 
+// Tampil tanggal dd/mm/yyyy (display saja; simpan/banding/CSV tetap ISO).
+// Tanpa Date agar anti-geser zona. Tak-valid -> tampil apa adanya.
+export function formatTanggal(iso: string | null | undefined): string {
+  const s = String(iso ?? "");
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
+  if (!m) return s;
+  return `${m[3]}/${m[2]}/${m[1]}`;
+}
+
 // --- Batas harian: 1 angka di localStorage. Belum diatur = 500rb; 0 = sembunyi.
 export function getBatasHarian(): number {
   try {

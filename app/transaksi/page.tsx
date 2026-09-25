@@ -23,6 +23,7 @@ import {
   deleteTransaksi,
   eksporCSV,
   formatRupiah,
+  formatTanggal,
   getBatasHarian,
   getSaldo,
   getTransaksi,
@@ -523,7 +524,7 @@ function IsiTransaksi() {
                           <strong className="truncate">{judul(t, notes)}</strong>
                         </span>
                         <span className="block truncate text-xs text-muted-foreground">
-                          {kategoriOf(t)} - {t.tanggal}
+                          {kategoriOf(t)} - {formatTanggal(t.tanggal)}
                         </span>
                       </span>
                       <strong className={`whitespace-nowrap text-xl tabular-nums ${t.jenis === "masuk" ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"}`}>

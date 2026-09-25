@@ -29,25 +29,25 @@ const lapor = (n, ok, d) => {
     await page.waitForFunction(() => /BudiF13 Rp100\.000 tercatat/.test(document.body.textContent ?? ""), null, { polling: 100, timeout: 30000 });
     lapor("tambah hutang", true);
     // Bayar 40000 -> sisa 60000
-    await page.locator("li", { hasText: "BudiF13" }).getByRole("button", { name: /^Bayar$/ }).click();
+    await page.locator("li", { hasText: "BudiF13" }).getByRole("button", { name: /^Cicil$/ }).click();
     await page.waitForSelector("#nom-bayar", { polling: 100, timeout: 15000 });
     await page.fill("#nom-bayar", "40000");
-    await page.locator('[role="dialog"]').getByRole("button", { name: /Simpan pembayaran/ }).click();
+    await page.locator('[role="dialog"]').getByRole("button", { name: /Simpan cicilan/ }).click();
     await page.waitForFunction(() => /sisa Rp60\.000/.test(document.body.textContent ?? ""), null, { polling: 100, timeout: 30000 });
     lapor("bayar sebagian + sisa", true);
     // Bayar melebihi sisa -> ditolak
-    await page.locator("li", { hasText: "BudiF13" }).getByRole("button", { name: /^Bayar$/ }).click();
+    await page.locator("li", { hasText: "BudiF13" }).getByRole("button", { name: /^Cicil$/ }).click();
     await page.waitForSelector("#nom-bayar", { polling: 100, timeout: 15000 });
     await page.fill("#nom-bayar", "999999");
-    await page.locator('[role="dialog"]').getByRole("button", { name: /Simpan pembayaran/ }).click();
+    await page.locator('[role="dialog"]').getByRole("button", { name: /Simpan cicilan/ }).click();
     await page.waitForFunction(() => /melebihi sisa/.test(document.body.textContent ?? ""), null, { polling: 100, timeout: 30000 });
     await page.locator('[role="dialog"]').getByRole("button", { name: /^Batal$/ }).click();
     lapor("tolak bayar melebihi sisa", true);
     // Lunaskan -> lunas + tombol bayar hilang
     await page.locator("li", { hasText: "BudiF13" }).getByRole("button", { name: /^Lunaskan$/ }).click();
     await page.waitForFunction(() => /Lunas \+ tercatat/.test(document.body.textContent ?? ""), null, { polling: 100, timeout: 30000 });
-    const bayarHilang = await page.locator("li", { hasText: "BudiF13" }).getByRole("button", { name: /^Bayar$/ }).count();
-    if (bayarHilang !== 0) throw new Error("tombol bayar masih ada setelah lunas");
+    const bayarHilang = await page.locator("li", { hasText: "BudiF13" }).getByRole("button", { name: /^Cicil$/ }).count();
+    if (bayarHilang !== 0) throw new Error("tombol cicil masih ada setelah lunas");
     lapor("lunaskan + audit", true);
     // Hapus lunas via lib langsung tak ada UI -> cek tombol hapus hilang
     const hapusAda = await page.locator("li", { hasText: "BudiF13" }).getByRole("button", { name: /^Hapus$/ }).count();
@@ -68,21 +68,21 @@ const lapor = (n, ok, d) => {
     await page.fill("#jml-hutang", "100000");
     await page.click('button[type="submit"]');
     await page.waitForFunction(() => /RincianF13/.test(document.body.textContent ?? ""), null, { polling: 100, timeout: 30000 });
-    await page.locator("li", { hasText: "RincianF13" }).getByRole("button", { name: /^Bayar$/ }).click();
+    await page.locator("li", { hasText: "RincianF13" }).getByRole("button", { name: /^Cicil$/ }).click();
     await page.waitForSelector("#tgl-bayar", { polling: 100, timeout: 15000 });
     await page.fill("#tgl-bayar", "2026-09-20");
     await page.fill("#nom-bayar", "30000");
-    await page.locator('[role="dialog"]').getByRole("button", { name: /Simpan pembayaran/ }).click();
+    await page.locator('[role="dialog"]').getByRole("button", { name: /Simpan cicilan/ }).click();
     await page.waitForFunction(() => /sisa Rp70\.000/.test(document.body.textContent ?? ""), null, { polling: 100, timeout: 30000 });
-    await page.locator("li", { hasText: "RincianF13" }).getByRole("button", { name: /^Bayar$/ }).click();
+    await page.locator("li", { hasText: "RincianF13" }).getByRole("button", { name: /^Cicil$/ }).click();
     await page.waitForSelector("#tgl-bayar", { polling: 100, timeout: 15000 });
     await page.fill("#nom-bayar", "20000");
-    await page.locator('[role="dialog"]').getByRole("button", { name: /Simpan pembayaran/ }).click();
+    await page.locator('[role="dialog"]').getByRole("button", { name: /Simpan cicilan/ }).click();
     await page.waitForFunction(() => /sisa Rp50\.000/.test(document.body.textContent ?? ""), null, { polling: 100, timeout: 30000 });
     await page.locator("li", { hasText: "RincianF13" }).getByRole("button", { name: /^Rincian$/ }).click();
     await page.waitForFunction(() => {
       const t = document.body.textContent ?? "";
-      const i1 = t.indexOf("2026-09-20");
+      const i1 = t.indexOf("20/09/2026");
       const i2 = t.indexOf("Rp30.000");
       const i3 = t.indexOf("Rp20.000");
       return i1 !== -1 && i2 !== -1 && i3 !== -1 && i1 < i2 && i2 < i3;

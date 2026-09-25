@@ -18,6 +18,7 @@ import {
   bayarHutang,
   deleteHutang,
   formatRupiah,
+  formatTanggal,
   getCicilan,
   getHutang,
   lunaskanHutang,
@@ -255,8 +256,8 @@ export default function HutangPage() {
                     )}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    {h.tanggal}
-                    {h.jatuhTempo ? ` - tempo ${h.jatuhTempo}` : ""} - Sisa Rp{formatRupiah(sisa(h))} dari Rp{formatRupiah(h.jumlah)}
+                    {formatTanggal(h.tanggal)}
+                    {h.jatuhTempo ? ` - tempo ${formatTanggal(h.jatuhTempo)}` : ""} - Sisa Rp{formatRupiah(sisa(h))} dari Rp{formatRupiah(h.jumlah)}
                   </p>
                   <div className="mt-2 h-2 overflow-hidden rounded-full bg-muted">
                     <div className="h-full rounded-full bg-emerald-600" style={{ width: `${h.jumlah > 0 ? Math.round((h.dibayar / h.jumlah) * 100) : 0}%` }} />
@@ -264,7 +265,7 @@ export default function HutangPage() {
                   <div className="mt-2 flex flex-wrap gap-2">
                     {h.status === "belum" && (
                       <>
-                        <Button size="sm" variant="secondary" onClick={() => bukaBayar(h)}>Bayar</Button>
+                        <Button size="sm" variant="secondary" onClick={() => bukaBayar(h)}>Cicil</Button>
                         <Button size="sm" variant="secondary" onClick={() => jalankanLunas(h.id)}>Lunaskan</Button>
                       </>
                     )}
@@ -301,7 +302,7 @@ export default function HutangPage() {
                                   jalan += Number(t.jumlah);
                                   return (
                                     <li key={t.id} className="flex justify-between gap-2 tabular-nums">
-                                      <span>{t.tanggal}</span>
+                                      <span>{formatTanggal(t.tanggal)}</span>
                                       <span>Rp{formatRupiah(t.jumlah)}</span>
                                     </li>
                                   );
@@ -309,7 +310,7 @@ export default function HutangPage() {
                               </ul>
                             )}
                             <p className="text-xs text-muted-foreground">
-                              tempo {h.jatuhTempo ?? "-"} • {h.keterangan || "tanpa keterangan"}
+                              tempo {h.jatuhTempo ? formatTanggal(h.jatuhTempo) : "-"} • {h.keterangan || "tanpa keterangan"}
                             </p>
                           </>
                         );
@@ -327,26 +328,26 @@ export default function HutangPage() {
       </div>
 
       <Dialog open={bayarId !== null} onOpenChange={(b) => { if (!b) setBayarId(null); }}>
-        <DialogContent aria-label="Bayar hutang">
+        <DialogContent aria-label="Cicil hutang">
           <DialogHeader>
             <DialogTitle>
-              Bayar{bayarH ? `: ${bayarH.pihak} (sisa Rp${formatRupiah(bayarH.jumlah - bayarH.dibayar)})` : ""}
+              Cicil{bayarH ? `: ${bayarH.pihak} (sisa Rp${formatRupiah(bayarH.jumlah - bayarH.dibayar)})` : ""}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
             <div>
-              <label className="mb-1 block text-sm font-medium" htmlFor="tgl-bayar">Tanggal bayar</label>
-              <Input id="tgl-bayar" type="date" value={bayarTgl} onChange={(e) => setBayarTgl(e.target.value)} />
+              <label className="mb-1 block text-sm font-medium" htmlFor="nom-bayar">Nominal cicilan</label>
+              <Input id="nom-bayar" inputMode="numeric" placeholder="contoh: 50000" value={bayarNom} onChange={(e) => ketikRp(e.target.value, setBayarNom)} />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium" htmlFor="nom-bayar">Nominal bayar</label>
-              <Input id="nom-bayar" inputMode="numeric" placeholder="contoh: 50000" value={bayarNom} onChange={(e) => ketikRp(e.target.value, setBayarNom)} />
+              <label className="mb-1 block text-sm font-medium" htmlFor="tgl-bayar">Tanggal cicilan</label>
+              <Input id="tgl-bayar" type="date" value={bayarTgl} onChange={(e) => setBayarTgl(e.target.value)} />
             </div>
             {bayarPesan && <p className="text-sm font-semibold text-red-600 dark:text-red-400">{bayarPesan}</p>}
           </div>
           <DialogFooter>
             <Button variant="secondary" onClick={() => setBayarId(null)}>Batal</Button>
-            <Button onClick={jalankanBayar}>Simpan pembayaran</Button>
+            <Button onClick={jalankanBayar}>Simpan cicilan</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
