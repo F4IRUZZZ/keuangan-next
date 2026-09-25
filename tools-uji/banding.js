@@ -1,4 +1,5 @@
 // Bukti C3: screenshot Next /transaksi (terang+gelap) vs vanilla /transaksi.
+require("fs").mkdirSync("bukti", { recursive: true });
 const { spawn } = require("child_process");
 const { chromium } = require("D:\\Project Developments\\GITHUB\\Webapp Keuangan(Ga Tuntas)\\tools\\uji\\node_modules\\playwright-core");
 

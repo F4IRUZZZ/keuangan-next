@@ -1,4 +1,5 @@
 // Verifikasi B1: restore backup vanilla -> banding angka -> screenshot 5 rute.
+require("fs").mkdirSync("bukti", { recursive: true });
 const { spawn } = require("child_process");
 const path = require("path");
 const { chromium } = require("D:\\Project Developments\\GITHUB\\Webapp Keuangan(Ga Tuntas)\\tools\\uji\\node_modules\\playwright-core");
