@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,22 +15,29 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { NumberTicker } from "@/components/ui/number-ticker";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   addCatatan,
   addTransaksi,
   deleteTransaksi,
+  eksporCSV,
   formatRupiah,
+  getBatasHarian,
+  getSaldo,
   getTransaksi,
   kategoriOf,
   muatSemuaCatatan,
   segarkanCacheProduk,
   tanggalHariIni,
+  unduhFile,
   updateTransaksi,
   type Catatan,
   type Jenis,
+  type Saldo,
   type Transaksi,
 } from "@/lib/db-lokal";
+import { akhirBulanIni, awalBulanIni } from "@/lib/periode";
 
 function judul(t: Transaksi, notes: Catatan[]): string {
   const n = notes.find((c) => c.transaksiId === t.id);
@@ -40,12 +48,17 @@ function judul(t: Transaksi, notes: Catatan[]): string {
 const CHIPS_TAMBAH = [10000, 50000, 100000, 500000];
 const CHIPS_TEMPEL = ["00", "000"];
 
-export default function TransaksiPage() {
+function IsiTransaksi() {
+  const params = useSearchParams();
   const [daftar, setDaftar] = useState<Transaksi[]>([]);
   const [notes, setNotes] = useState<Catatan[]>([]);
   const [saran, setSaran] = useState<string[]>([]);
   const [tab, setTab] = useState("semua");
   const [cari, setCari] = useState("");
+  const [cepat, setCepat] = useState<{ dari: string; sampai: string } | null>(null);
+  const [saldoBulan, setSaldoBulan] = useState<Saldo>({ masuk: 0, keluar: 0, saldo: 0 });
+  const [keluarHari, setKeluarHari] = useState(0);
+  const [batas, setBatas] = useState(500000);
   // Form state (pola vanilla: 1 state per field)
   const [jenis, setJenis] = useState<Jenis>("masuk");
   const [nominal, setNominal] = useState("");
@@ -55,37 +68,30 @@ export default function TransaksiPage() {
   const [pesan, setPesan] = useState("");
   const [pesanOk, setPesanOk] = useState(false);
   const [menyimpan, setMenyimpan] = useState(false);
-  // Bulk hapus (port Set vanilla): id terpilih + bar aksi.
+  // Bulk hapus (port Set vanilla)
   const [terpilih, setTerpilih] = useState<Set<number>>(new Set());
-  // Dialog ubah (shadcn) + dialog hapus (konfirmasi).
+  // Dialog ubah + hapus
   const [ubahId, setUbahId] = useState<number | null>(null);
   const [ubahTgl, setUbahTgl] = useState("");
   const [ubahJml, setUbahJml] = useState("");
   const [ubahKat, setUbahKat] = useState("");
   const [ubahPesan, setUbahPesan] = useState("");
   const [hapusId, setHapusId] = useState<number | null>(null);
-
-  // Tulis nominal 1 pintu (DRY B2.2b): semua jalur (ketik, tambah, tempel)
-  // lewat sini -> selalu tampil format ribuan. Maks 15 digit.
-  function tulisNominalDariDigit(digit: string) {
-    const potong = digit.replace(/[^0-9]/g, "").slice(0, 15);
-    setNominal(potong ? formatRupiah(Number(potong)) : "");
-  }
-
-  // Format live nominal (port pasangFormatRupiahLive): digit -> titik ribuan.
-  // Keterbatasan sama: kursor lompat ke akhir (terdokumentasi).
-  function ketikNominal(v: string) {
-    tulisNominalDariDigit(v);
-  }
+  const refCari = useRef<HTMLInputElement>(null);
 
   async function muat() {
-    const [d, n, prods] = await Promise.all([
+    const [d, n, prods, sb, sh] = await Promise.all([
       getTransaksi(),
       muatSemuaCatatan(),
       segarkanCacheProduk(),
+      getSaldo({ dari: awalBulanIni(), sampai: akhirBulanIni() }),
+      getSaldo({ dari: tanggalHariIni(), sampai: tanggalHariIni() }),
     ]);
     setDaftar(d);
     setNotes(n);
+    setSaldoBulan(sb);
+    setKeluarHari(sh.keluar);
+    setBatas(getBatasHarian());
     const kat = new Set<string>();
     prods.forEach((p) => kat.add(p.kategori));
     d.forEach((t) => kat.add(kategoriOf(t)));
@@ -95,6 +101,31 @@ export default function TransaksiPage() {
   useEffect(() => {
     muat();
   }, []);
+
+  // Preset ?jenis= (butuh Suspense di Next static — lihat pembungkus bawah)
+  useEffect(() => {
+    const j = params.get("jenis");
+    if (j === "masuk" || j === "keluar") setJenis(j);
+  }, [params]);
+
+  function tulisNominalDariDigit(digit: string) {
+    const potong = digit.replace(/[^0-9]/g, "").slice(0, 15);
+    setNominal(potong ? formatRupiah(Number(potong)) : "");
+  }
+
+  function ketikNominal(v: string) {
+    tulisNominalDariDigit(v);
+  }
+
+  function resetForm() {
+    setNominal("");
+    setKategori("");
+    setCatatan("");
+    setTanggal(tanggalHariIni());
+    setJenis("masuk");
+    setPesan("Form dikosongkan.");
+    setPesanOk(true);
+  }
 
   async function simpan(e: React.FormEvent) {
     e.preventDefault();
@@ -203,9 +234,25 @@ export default function TransaksiPage() {
     await muat();
   }
 
+  async function unduhCSVToolbar() {
+    unduhFile(`keuangan-${tanggalHariIni()}.csv`, await eksporCSV(), "text/csv");
+    setPesan("CSV diekspor.");
+    setPesanOk(true);
+  }
+
+  function toggleCepat(kunci: "hari" | "bulan") {
+    const hari = tanggalHariIni();
+    const rentang =
+      kunci === "hari"
+        ? { dari: hari, sampai: hari }
+        : { dari: awalBulanIni(), sampai: akhirBulanIni() };
+    setCepat((c) => (c && c.dari === rentang.dari && c.sampai === rentang.sampai ? null : rentang));
+  }
+
   const kata = cari.trim().toLowerCase();
   const data = daftar.filter((t) => {
     if (tab !== "semua" && t.jenis !== tab) return false;
+    if (cepat && (t.tanggal < cepat.dari || t.tanggal > cepat.sampai)) return false;
     if (!kata) return true;
     const notesT = notes
       .filter((c) => c.transaksiId === t.id)
@@ -222,6 +269,7 @@ export default function TransaksiPage() {
   const nMasuk = data.filter((t) => t.jenis === "masuk").length;
   const subtotal = data.reduce((s, t) => s + Number(t.jumlah), 0);
   const mMasuk = data.filter((t) => t.jenis === "masuk").reduce((s, t) => s + Number(t.jumlah), 0);
+  const persenLimit = batas > 0 ? Math.min(100, Math.round((keluarHari / batas) * 100)) : 0;
 
   return (
     <main className="mx-auto w-full max-w-6xl space-y-6 p-4 pb-16 md:p-8">
@@ -229,92 +277,140 @@ export default function TransaksiPage() {
         <h1 className="text-3xl font-bold">Catat &amp; Kelola Transaksi</h1>
         <Badge variant="secondary">Offline - Perangkat ini</Badge>
       </div>
-
-      <div className="grid items-start gap-6 lg:grid-cols-[420px_minmax(0,1fr)]">
+      <div className="grid grid-cols-2 gap-3">
         <Card>
-          <CardHeader>
-            <CardTitle>Catat Transaksi</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={simpan} className="space-y-4">
-              <Tabs value={jenis} onValueChange={(v) => setJenis(v as Jenis)}>
-                <TabsList id="tab-form" className="grid w-full grid-cols-2">
-                  <TabsTrigger value="masuk">Masuk</TabsTrigger>
-                  <TabsTrigger value="keluar">Keluar</TabsTrigger>
-                </TabsList>
-              </Tabs>
-              <div>
-                <label className="mb-1 block text-sm font-medium" htmlFor="jml">Jumlah</label>
-                <Input
-                  id="jml"
-                  inputMode="numeric"
-                  className="text-3xl font-bold"
-                  placeholder="contoh: 20000"
-                  value={nominal}
-                  onChange={(e) => ketikNominal(e.target.value)}
-                />
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {CHIPS_TEMPEL.map((nol) => (
-                    <Button
-                      key={"t" + nol}
-                      type="button"
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => tulisNominalDariDigit(String(nominal.replace(/[^0-9]/g, "")) + nol)}
-                    >
-                      +{nol}
-                    </Button>
-                  ))}
-                  {CHIPS_TAMBAH.map((c) => (
-                    <Button
-                      key={c}
-                      type="button"
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => tulisNominalDariDigit(String((Number(nominal.replace(/[^0-9]/g, "")) || 0) + c))}
-                    >
-                      +{c / 1000}rb
-                    </Button>
-                  ))}
-                </div>
-              </div>
-              {jenis === "keluar" && (
-                <div>
-                  <label className="mb-1 block text-sm font-medium" htmlFor="kat">Untuk apa?</label>
-                  <Input
-                    id="kat"
-                    list="saran-kat"
-                    placeholder="contoh: Makan / Beras / Parkir"
-                    autoComplete="off"
-                    value={kategori}
-                    onChange={(e) => setKategori(e.target.value)}
-                  />
-                  <datalist id="saran-kat">
-                    {saran.map((s) => (
-                      <option key={s} value={s} />
-                    ))}
-                  </datalist>
-                </div>
-              )}
-              <div>
-                <label className="mb-1 block text-sm font-medium" htmlFor="tgl">Tanggal</label>
-                <Input id="tgl" type="date" value={tanggal} onChange={(e) => setTanggal(e.target.value)} />
-              </div>
-              <div>
-                <label className="mb-1 block text-sm font-medium" htmlFor="ctt">Catatan (opsional)</label>
-                <Input id="ctt" placeholder="contoh: Gajian minggu ini" value={catatan} onChange={(e) => setCatatan(e.target.value)} />
-              </div>
-              <Button type="submit" className="w-full" size="lg" disabled={menyimpan}>
-                {menyimpan ? "Menyimpan..." : "Simpan Transaksi"}
-              </Button>
-              {pesan && (
-                <p className={`text-sm font-semibold ${pesanOk ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"}`}>
-                  {pesan}
-                </p>
-              )}
-            </form>
+          <CardContent className="pt-4">
+            <p className="text-xs text-muted-foreground">Masuk (Bln Ini)</p>
+            <p className="text-2xl font-bold text-emerald-600 tabular-nums dark:text-emerald-400">
+              Rp<NumberTicker value={saldoBulan.masuk} />
+            </p>
           </CardContent>
         </Card>
+        <Card>
+          <CardContent className="pt-4">
+            <p className="text-xs text-muted-foreground">Keluar (Bln Ini)</p>
+            <p className="text-2xl font-bold text-red-600 tabular-nums dark:text-red-400">
+              Rp<NumberTicker value={saldoBulan.keluar} />
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid items-start gap-6 lg:grid-cols-[420px_minmax(0,1fr)]">
+        <div className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Catat Transaksi</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={simpan} className="space-y-4">
+                <Tabs value={jenis} onValueChange={(v) => setJenis(v as Jenis)}>
+                  <TabsList id="tab-form" className="grid w-full grid-cols-2">
+                    <TabsTrigger value="masuk">Masuk</TabsTrigger>
+                    <TabsTrigger value="keluar">Keluar</TabsTrigger>
+                  </TabsList>
+                </Tabs>
+                <div>
+                  <label className="mb-1 block text-sm font-medium" htmlFor="jml">Jumlah</label>
+                  <Input
+                    id="jml"
+                    inputMode="numeric"
+                    className="text-3xl font-bold"
+                    placeholder="contoh: 20000"
+                    value={nominal}
+                    onChange={(e) => ketikNominal(e.target.value)}
+                  />
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {CHIPS_TEMPEL.map((nol) => (
+                      <Button
+                        key={"t" + nol}
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => tulisNominalDariDigit(String(nominal.replace(/[^0-9]/g, "")) + nol)}
+                      >
+                        +{nol}
+                      </Button>
+                    ))}
+                    {CHIPS_TAMBAH.map((c) => (
+                      <Button
+                        key={c}
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => tulisNominalDariDigit(String((Number(nominal.replace(/[^0-9]/g, "")) || 0) + c))}
+                      >
+                        +{c / 1000}rb
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+                {jenis === "keluar" && (
+                  <div>
+                    <label className="mb-1 block text-sm font-medium" htmlFor="kat">Untuk apa?</label>
+                    <Input
+                      id="kat"
+                      list="saran-kat"
+                      placeholder="contoh: Makan / Beras / Parkir"
+                      autoComplete="off"
+                      value={kategori}
+                      onChange={(e) => setKategori(e.target.value)}
+                    />
+                    <datalist id="saran-kat">
+                      {saran.map((s) => (
+                        <option key={s} value={s} />
+                      ))}
+                    </datalist>
+                  </div>
+                )}
+                <div>
+                  <label className="mb-1 block text-sm font-medium" htmlFor="tgl">Tanggal</label>
+                  <Input id="tgl" type="date" value={tanggal} onChange={(e) => setTanggal(e.target.value)} />
+                </div>
+                <div>
+                  <label className="mb-1 block text-sm font-medium" htmlFor="ctt">Catatan (opsional)</label>
+                  <Input id="ctt" placeholder="contoh: Gajian minggu ini" value={catatan} onChange={(e) => setCatatan(e.target.value)} />
+                </div>
+                <div className="flex gap-2">
+                  <Button type="submit" className="flex-1" size="lg" disabled={menyimpan}>
+                    {menyimpan ? "Menyimpan..." : "Simpan Transaksi"}
+                  </Button>
+                  <Button type="button" variant="secondary" size="lg" onClick={resetForm}>
+                    Reset
+                  </Button>
+                </div>
+                {pesan && (
+                  <p className={`text-sm font-semibold ${pesanOk ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"}`}>
+                    {pesan}
+                  </p>
+                )}
+              </form>
+            </CardContent>
+          </Card>
+          {batas > 0 && (
+            <Card id="limit-card">
+              <CardContent className="space-y-2 pt-4">
+                <div className="flex items-center justify-between gap-3">
+                  <strong className="text-sm">Limit Pengeluaran Harian</strong>
+                  <span className="text-xs text-muted-foreground">
+                    Rp{formatRupiah(keluarHari)} / Rp{formatRupiah(batas)}
+                  </span>
+                </div>
+                <div className="h-2 overflow-hidden rounded-full bg-muted">
+                  <div className="h-full rounded-full bg-emerald-600" style={{ width: `${persenLimit}%` }} />
+                </div>
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span>
+                    {batas - keluarHari >= 0
+                      ? `Tersisa Rp${formatRupiah(batas - keluarHari)} aman untuk hari ini`
+                      : `Melebihi batas Rp${formatRupiah(keluarHari - batas)}`}
+                  </span>
+                  <span>{persenLimit}%</span>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
 
         <section className="space-y-4">
           <Tabs value={tab} onValueChange={setTab}>
@@ -324,7 +420,34 @@ export default function TransaksiPage() {
               <TabsTrigger value="keluar">Keluar ({data.length - nMasuk})</TabsTrigger>
             </TabsList>
           </Tabs>
-          <Input placeholder="Cari kategori / catatan / tanggal / nominal" value={cari} onChange={(e) => setCari(e.target.value)} />
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant={cepat?.dari === tanggalHariIni() ? "default" : "secondary"}
+              size="sm"
+              onClick={() => toggleCepat("hari")}
+            >
+              Hari Ini
+            </Button>
+            <Button
+              variant={cepat ? "default" : "secondary"}
+              size="sm"
+              onClick={() => toggleCepat("bulan")}
+            >
+              Bulan Ini
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => refCari.current?.focus()}>
+              Cari
+            </Button>
+            <Button variant="secondary" size="sm" onClick={unduhCSVToolbar}>
+              CSV
+            </Button>
+          </div>
+          <Input
+            ref={refCari}
+            placeholder="Cari kategori / catatan / tanggal / nominal"
+            value={cari}
+            onChange={(e) => setCari(e.target.value)}
+          />
           {!terpilih.size ? null : (
             <div className="flex items-center gap-2 rounded-xl border p-2 text-sm">
               <span>{terpilih.size} terpilih.</span>
@@ -401,7 +524,6 @@ export default function TransaksiPage() {
             />
             Pilih semua yang tampil
           </label>
-          <p className="text-xs text-muted-foreground">Ubah/hapus via Dialog menyusul di B2.2.</p>
         </section>
       </div>
       <Link href="/pengaturan" className="text-sm font-semibold text-muted-foreground underline">
@@ -453,5 +575,13 @@ export default function TransaksiPage() {
         </DialogContent>
       </Dialog>
     </main>
+  );
+}
+
+export default function TransaksiPage() {
+  return (
+    <Suspense fallback={<main className="p-8 text-sm text-muted-foreground">Memuat transaksi...</main>}>
+      <IsiTransaksi />
+    </Suspense>
   );
 }

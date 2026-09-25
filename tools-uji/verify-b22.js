@@ -75,6 +75,44 @@ const lapor = (n, ok, d) => {
     await page.getByRole("button", { name: /Hapus terpilih/ }).click();
     await page.waitForFunction(() => /2 transaksi dihapus/.test(document.body.textContent ?? ""), null, { timeout: 10000 });
     lapor("bulk hapus 2 + cascade", true);
+    // F1.2: preset URL + reset + filter hari + CSV + footer + limit + mini-stat
+    await page.goto(`${BASE}/transaksi?jenis=keluar`, { waitUntil: "load", timeout: 120000 });
+    await page.waitForFunction(() => {
+      const el = document.querySelector("#tab-form [aria-selected='true']");
+      return el && /Keluar/i.test(el.textContent ?? "");
+    }, null, { timeout: 15000 });
+    const jenisAktif = await page.$eval("#tab-form", (el) => el.querySelector('[aria-selected="true"]')?.textContent ?? "");
+    if (!/Keluar/i.test(jenisAktif)) throw new Error("preset ?jenis= gagal: " + jenisAktif);
+    lapor("preset ?jenis=keluar", true);
+    await page.fill("#jml", "999");
+    await page.getByRole("button", { name: /^Reset$/ }).click();
+    const resetOk = await page.$eval("#jml", (el) => el.value === "");
+    if (!resetOk) throw new Error("reset gagal");
+    lapor("reset form", true);
+    await page.getByRole("button", { name: /^Hari Ini$/ }).click();
+    await page.waitForTimeout(800);
+    const footerHari = await page.evaluate(() => document.body.textContent ?? "");
+    if (!/Menampilkan \d+ dari \d+ catatan/.test(footerHari)) throw new Error("footer hitung hilang");
+    lapor("filter Hari Ini + footer hitung", true);
+    await page.getByRole("button", { name: /^Hari Ini$/ }).click(); // toggle lepas
+    const [csvDl] = await Promise.all([
+      page.waitForEvent("download", { timeout: 8000 }),
+      page.getByRole("button", { name: /^CSV$/ }).click(),
+    ]);
+    const csvPath = `bukti-f12-daftar.csv`;
+    await csvDl.saveAs(csvPath);
+    const csvIsi = require("fs").readFileSync(csvPath, "utf8");
+    if (csvIsi.split("\n")[0].trim() !== "tanggal,jenis,jumlah,kategori,catatan") throw new Error("header CSV salah");
+    require("fs").unlinkSync(csvPath);
+    lapor("CSV toolbar valid", true);
+    const limitAda = await page.evaluate(() => {
+      const el = document.getElementById("limit-card");
+      return !!el && !el.hidden && /Limit Pengeluaran Harian/.test(document.body.textContent ?? "");
+    });
+    if (!limitAda) throw new Error("kartu limit tak tampil");
+    const miniAda = await page.evaluate(() => /Bln Ini/.test(document.body.textContent ?? ""));
+    if (!miniAda) throw new Error("mini-stat tak tampil");
+    lapor("kartu limit + mini-stat", true);
     const serius = errs.filter((m) => !/favicon/i.test(m));
     lapor("console bersih", serius.length === 0, serius.slice(0, 2).join(" | "));
   } catch (e) {
