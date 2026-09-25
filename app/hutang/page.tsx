@@ -18,11 +18,14 @@ import {
   bayarHutang,
   deleteHutang,
   formatRupiah,
+  formatTanggal,
+  getCicilan,
   getHutang,
   lunaskanHutang,
   tanggalHariIni,
   type Arah,
   type Hutang,
+  type Transaksi,
 } from "@/lib/db-lokal";
 
 export default function HutangPage() {
@@ -41,8 +44,12 @@ export default function HutangPage() {
   // Dialog bayar + hapus
   const [bayarId, setBayarId] = useState<number | null>(null);
   const [bayarNom, setBayarNom] = useState("");
+  const [bayarTgl, setBayarTgl] = useState(tanggalHariIni());
   const [bayarPesan, setBayarPesan] = useState("");
   const [hapusId, setHapusId] = useState<number | null>(null);
+  // Panel rincian cicilan (akordeon: 1 terbuka per saat)
+  const [rincianId, setRincianId] = useState<number | null>(null);
+  const [rincianRows, setRincianRows] = useState<Transaksi[]>([]);
 
   async function muat() {
     setDaftar(await getHutang());
@@ -91,13 +98,15 @@ export default function HutangPage() {
   function bukaBayar(h: Hutang) {
     setBayarId(h.id);
     setBayarNom("");
+    setBayarTgl(tanggalHariIni());
     setBayarPesan("");
   }
 
   async function jalankanBayar() {
     if (bayarId === null) return;
+    console.log("DBG-JALANKAN-BAYAR id=" + bayarId);
     const n = Number(String(bayarNom).replace(/[^0-9]/g, "")) || 0;
-    const out = await bayarHutang(bayarId, n);
+    const out = await bayarHutang(bayarId, n, bayarTgl || undefined);
     if ("error" in out) {
       setBayarPesan(`Gagal (${out.code}): ${out.error}`);
       return;
@@ -107,9 +116,11 @@ export default function HutangPage() {
     setPesan(out.data.status === "lunas" ? "Lunas + tercatat di kas." : `Bayaran tercatat, sisa Rp${formatRupiah(s)}.`);
     setPesanOk(true);
     await muat();
+    if (rincianId === out.data.id) setRincianRows(await getCicilan(out.data.id));
   }
 
   async function jalankanLunas(id: number) {
+    console.log("DBG-JALANKAN-LUNAS id=" + id);
     const out = await lunaskanHutang(id);
     if ("error" in out) {
       setPesan(`Gagal (${out.code}): ${out.error}`);
@@ -139,6 +150,15 @@ export default function HutangPage() {
     setPesan("Catatan dihapus.");
     setPesanOk(true);
     await muat();
+  }
+
+  async function toggleRincian(h: Hutang) {
+    if (rincianId === h.id) {
+      setRincianId(null);
+      return;
+    }
+    setRincianId(h.id);
+    setRincianRows(await getCicilan(h.id));
   }
 
   const data = daftar.filter((h) => tab === "semua" || h.arah === tab);
@@ -236,23 +256,67 @@ export default function HutangPage() {
                     )}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    {h.tanggal}
-                    {h.jatuhTempo ? ` - tempo ${h.jatuhTempo}` : ""} - Sisa Rp{formatRupiah(sisa(h))} dari Rp{formatRupiah(h.jumlah)}
+                    {formatTanggal(h.tanggal)}
+                    {h.jatuhTempo ? ` - tempo ${formatTanggal(h.jatuhTempo)}` : ""} - Sisa Rp{formatRupiah(sisa(h))} dari Rp{formatRupiah(h.jumlah)}
                   </p>
                   <div className="mt-2 h-2 overflow-hidden rounded-full bg-muted">
                     <div className="h-full rounded-full bg-emerald-600" style={{ width: `${h.jumlah > 0 ? Math.round((h.dibayar / h.jumlah) * 100) : 0}%` }} />
                   </div>
-                  <div className="mt-2 flex gap-2">
+                  <div className="mt-2 flex flex-wrap gap-2">
                     {h.status === "belum" && (
                       <>
-                        <Button size="sm" variant="secondary" onClick={() => bukaBayar(h)}>Bayar</Button>
+                        <Button size="sm" variant="secondary" onClick={() => bukaBayar(h)}>Cicil</Button>
                         <Button size="sm" variant="secondary" onClick={() => jalankanLunas(h.id)}>Lunaskan</Button>
                       </>
                     )}
                     {h.status === "belum" && (
                       <Button size="sm" variant="ghost" onClick={() => setHapusId(h.id)}>Hapus</Button>
                     )}
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      aria-expanded={rincianId === h.id}
+                      onClick={() => toggleRincian(h)}
+                    >
+                      {rincianId === h.id ? "Tutup rincian" : "Rincian"}
+                    </Button>
                   </div>
+                  {rincianId === h.id && (
+                    <div className="mt-2 space-y-1 rounded-lg border p-2 text-sm">
+                      {(() => {
+                        const totalTaut = rincianRows.reduce((s, t) => s + Number(t.jumlah), 0);
+                        const praFitur = h.dibayar - totalTaut;
+                        let jalan = 0;
+                        return (
+                          <>
+                            {praFitur > 0 && (
+                              <p className="text-xs text-muted-foreground">
+                                Ada Rp{formatRupiah(praFitur)} pembayaran sebelum fitur tanggal (tak tercatat tanggalnya).
+                              </p>
+                            )}
+                            {rincianRows.length === 0 && praFitur <= 0 ? (
+                              <p className="text-xs text-muted-foreground">Belum ada cicilan tercatat.</p>
+                            ) : (
+                              <ul className="space-y-1">
+                                {rincianRows.map((t) => {
+                                  jalan += Number(t.jumlah);
+                                  return (
+                                    <li key={t.id} className="flex justify-between gap-2 tabular-nums">
+                                      <span>{formatTanggal(t.tanggal)}</span>
+                                      <span>Rp{formatRupiah(t.jumlah)}</span>
+                                    </li>
+                                  );
+                                })}
+                              </ul>
+                            )}
+                            <p className="text-xs text-muted-foreground">
+                              tempo {h.jatuhTempo ? formatTanggal(h.jatuhTempo) : "-"} • {h.keterangan || "tanpa keterangan"}
+                            </p>
+                          </>
+                        );
+                      })()}
+                    </div>
+                  )}
                 </li>
               ))}
             </ul>
@@ -264,22 +328,26 @@ export default function HutangPage() {
       </div>
 
       <Dialog open={bayarId !== null} onOpenChange={(b) => { if (!b) setBayarId(null); }}>
-        <DialogContent aria-label="Bayar hutang">
+        <DialogContent aria-label="Cicil hutang">
           <DialogHeader>
             <DialogTitle>
-              Bayar{bayarH ? `: ${bayarH.pihak} (sisa Rp${formatRupiah(bayarH.jumlah - bayarH.dibayar)})` : ""}
+              Cicil{bayarH ? `: ${bayarH.pihak} (sisa Rp${formatRupiah(bayarH.jumlah - bayarH.dibayar)})` : ""}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
             <div>
-              <label className="mb-1 block text-sm font-medium" htmlFor="nom-bayar">Nominal bayar</label>
+              <label className="mb-1 block text-sm font-medium" htmlFor="nom-bayar">Nominal cicilan</label>
               <Input id="nom-bayar" inputMode="numeric" placeholder="contoh: 50000" value={bayarNom} onChange={(e) => ketikRp(e.target.value, setBayarNom)} />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium" htmlFor="tgl-bayar">Tanggal cicilan</label>
+              <Input id="tgl-bayar" type="date" value={bayarTgl} onChange={(e) => setBayarTgl(e.target.value)} />
             </div>
             {bayarPesan && <p className="text-sm font-semibold text-red-600 dark:text-red-400">{bayarPesan}</p>}
           </div>
           <DialogFooter>
             <Button variant="secondary" onClick={() => setBayarId(null)}>Batal</Button>
-            <Button onClick={jalankanBayar}>Simpan pembayaran</Button>
+            <Button onClick={jalankanBayar}>Simpan cicilan</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { NumberTicker } from "@/components/ui/number-ticker";
 import {
   formatRupiah,
+  formatTanggal,
   getRingkasanKategori,
   getSaldo,
   getTransaksi,
@@ -173,7 +174,7 @@ export default function Dashboard() {
                     {t.jenis === "masuk" ? "MASUK" : "KELUAR"}
                   </Badge>
                   <span className="min-w-0 flex-1 truncate">
-                    {kategoriOf(t)} • {t.tanggal}
+                    {kategoriOf(t)} • {formatTanggal(t.tanggal)}
                   </span>
                   <strong className="tabular-nums">Rp{formatRupiah(t.jumlah)}</strong>
                 </li>

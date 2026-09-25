@@ -1,4 +1,5 @@
 // Cek cepat nav bawah + font (sekali pakai).
+require("fs").mkdirSync("bukti", { recursive: true });
 const { chromium } = require("D:\\Project Developments\\GITHUB\\Webapp Keuangan(Ga Tuntas)\\tools\\uji\\node_modules\\playwright-core");
 
 (async () => {
@@ -17,13 +18,13 @@ const { chromium } = require("D:\\Project Developments\\GITHUB\\Webapp Keuangan(
     return `fixed items=${items} bottom=${Math.round(r.bottom)}/${window.innerHeight}`;
   });
   console.log("MOBILE-NAV: " + nav);
-  await m.screenshot({ path: "bukti-nav-hp.png" });
+  await m.screenshot({ path: "bukti/bukti-nav-hp.png" });
   const d = await (await browser.newContext({ viewport: { width: 1280, height: 900 } })).newPage();
   await d.goto("http://localhost:3000/transaksi", { waitUntil: "load", timeout: 120000 });
   await d.waitForTimeout(1500);
   console.log("DESKTOP-TOPBAR: " + (await d.evaluate(() => !!document.querySelector("nav.sticky"))));
   console.log("FONT-H1: " + (await d.evaluate(() => getComputedStyle(document.querySelector("h1")).fontFamily)).slice(0, 60));
-  await d.screenshot({ path: "bukti-nav-desktop.png" });
+  await d.screenshot({ path: "bukti/bukti-nav-desktop.png" });
   await browser.close();
   const serius = errs.filter((e) => !/favicon/i.test(e));
   console.log("console-errs=" + serius.length + (serius.length ? " " + serius.slice(0, 2).join(" | ") : ""));

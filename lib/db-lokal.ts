@@ -18,6 +18,8 @@ export interface Transaksi {
   produkId: number | null;
   kategori: string | null;
   tanggal: string;
+  // Tautan kas auto-hutang (bayar/lunas). null = manual / pra-fitur.
+  hutangId?: number | null;
 }
 export interface Catatan {
   id: number;
@@ -170,7 +172,9 @@ function dbSemua<T>(store: string): Promise<T[]> {
         }
         const tx = _db.transaction(store, "readonly");
         const q = tx.objectStore(store).getAll();
-        q.onsuccess = () => selesai((q.result as T[]) || []);
+        q.onsuccess = () => {
+          selesai((q.result as T[]) || []);
+        };
         q.onerror = () => gagal(q.error);
       })
   );
@@ -510,7 +514,8 @@ export async function addHutang(input: InputHutang): Promise<Hasil<Hutang>> {
 
 export async function bayarHutang(
   id: number,
-  nominal: unknown
+  nominal: unknown,
+  tanggal?: string
 ): Promise<Hasil<Hutang>> {
   const h = await dbAmbil<Hutang>("hutang", Number(id));
   if (!h) return { error: "Hutang tidak ditemukan", code: 404 };
@@ -519,6 +524,7 @@ export async function bayarHutang(
   if (h.status === "lunas") return { error: "Sudah lunas", code: 400 };
   const sisa = h.jumlah - h.dibayar;
   if (n > sisa) return { error: `Nominal melebihi sisa Rp${sisa}`, code: 400 };
+  const tgl = tanggal && validTanggalLokal(tanggal) ? tanggal : tanggalHariIni();
   const jenisKas: Jenis = h.arah === "hutang" ? "keluar" : "masuk";
   const kas = await dbSimpan<Transaksi>("transaksi", {
     id: null as unknown as number,
@@ -526,7 +532,8 @@ export async function bayarHutang(
     jumlah: n,
     produkId: null,
     kategori: null,
-    tanggal: tanggalHariIni(),
+    tanggal: tgl,
+    hutangId: h.id,
   });
   await dbSimpan<Catatan>("catatan", {
     id: null as unknown as number,
@@ -542,11 +549,12 @@ export async function bayarHutang(
   return { data: baris, code: 200 };
 }
 
-export async function lunaskanHutang(id: number): Promise<Hasil<Hutang>> {
+export async function lunaskanHutang(id: number, tanggal?: string): Promise<Hasil<Hutang>> {
   const h = await dbAmbil<Hutang>("hutang", Number(id));
   if (!h) return { error: "Hutang tidak ditemukan", code: 404 };
   if (h.status === "lunas") return { error: "Sudah lunas", code: 400 };
   const sisa = h.jumlah - h.dibayar;
+  const tgl = tanggal && validTanggalLokal(tanggal) ? tanggal : tanggalHariIni();
   const jenisKas: Jenis = h.arah === "hutang" ? "keluar" : "masuk";
   const kas = await dbSimpan<Transaksi>("transaksi", {
     id: null as unknown as number,
@@ -554,7 +562,8 @@ export async function lunaskanHutang(id: number): Promise<Hasil<Hutang>> {
     jumlah: sisa,
     produkId: null,
     kategori: null,
-    tanggal: tanggalHariIni(),
+    tanggal: tgl,
+    hutangId: h.id,
   });
   await dbSimpan<Catatan>("catatan", {
     id: null as unknown as number,
@@ -566,6 +575,15 @@ export async function lunaskanHutang(id: number): Promise<Hasil<Hutang>> {
   h.transaksiIdLunas = kas.id;
   const baris = await dbSimpan<Hutang>("hutang", h);
   return { data: baris, code: 200 };
+}
+
+// --- Cicilan per hutang (F1.3b): kas auto bertaut hutangId, terurut tanggal.
+// Baris pra-fitur (hutangId null) tak ikut — UI wajib nyatakan bila ada.
+export async function getCicilan(hutangId: number): Promise<Transaksi[]> {
+  const semua = await dbSemua<Transaksi>("transaksi");
+  return semua
+    .filter((t) => t.hutangId === Number(hutangId))
+    .sort((a, b) => (a.tanggal < b.tanggal ? -1 : a.tanggal > b.tanggal ? 1 : a.id - b.id));
 }
 
 export async function deleteHutang(id: number): Promise<boolean | { error: string; code: number }> {
@@ -660,6 +678,15 @@ export async function hapusSemuaData(): Promise<void> {
 
 export function formatRupiah(n: number): string {
   return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
+// Tampil tanggal dd/mm/yyyy (display saja; simpan/banding/CSV tetap ISO).
+// Tanpa Date agar anti-geser zona. Tak-valid -> tampil apa adanya.
+export function formatTanggal(iso: string | null | undefined): string {
+  const s = String(iso ?? "");
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
+  if (!m) return s;
+  return `${m[3]}/${m[2]}/${m[1]}`;
 }
 
 // --- Batas harian: 1 angka di localStorage. Belum diatur = 500rb; 0 = sembunyi.

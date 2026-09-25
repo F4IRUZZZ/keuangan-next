@@ -34,7 +34,7 @@
 - [x] F1.1: catatan inline per transaksi (PR #6 merged)
 - [x] F1.2: limit harian + setting + mini-stat bulan + preset ?jenis + reset + filter Hari/Bulan + CSV toolbar + footer hitung + pilih-semua toolbar + Dialog bulk (PR #8 merged)
 - [x] F1.3: hutang tulis/bayar/lunas/hapus + progress + tempo + badge arah + Dialog Zona Bahaya + search toggle (PR #10 + #12 merged)
-- [ ] F1.3b (tertunda dari request): tanggal cicilan bisa diatur + tombol Rincian riwayat cicilan per hutang
+- [~] F1.3b: tanggal cicilan bisa diatur + tombol Rincian riwayat (PR #14, uji hijau 2x)
 - [ ] F1.4: produk CRUD + hitung pakai (= sisa B2.3)
 - [ ] F1.5: dashboard riwayat ringkas + grafik mingguan
 - [ ] F1.6: menu Riwayat terpisah (tab Transaksi | Hutang, baca-saja; dashboard tetap 5 + link) — dieksekusi setelah F1.5

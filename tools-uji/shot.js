@@ -1,4 +1,5 @@
 // Screenshot bukti C2: halaman bawaan + demo 2 komponen 21st/shadcn.
+require("fs").mkdirSync("bukti", { recursive: true });
 const { spawn } = require("child_process");
 const { chromium } = require("D:\\Project Developments\\GITHUB\\Webapp Keuangan(Ga Tuntas)\\tools\\uji\\node_modules\\playwright-core");
 
