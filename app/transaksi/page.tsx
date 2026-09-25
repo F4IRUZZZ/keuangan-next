@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { DialogCatatan } from "@/components/dialog-catatan";
 import {
   Dialog,
   DialogContent,
@@ -368,6 +369,7 @@ export default function TransaksiPage() {
                       </strong>
                       <Button variant="ghost" size="icon" aria-label="Ubah" onClick={() => bukaUbah(t)}>Ubah</Button>
                       <Button variant="ghost" size="icon" aria-label="Hapus" onClick={() => setHapusId(t.id)}>Hapus</Button>
+                      <DialogCatatan transaksiId={t.id} judul={judul(t, notes)} onBerubah={muat} />
                     </CardContent>
                   </Card>
                 </li>

@@ -6,35 +6,32 @@
 
 ## Legenda
 
-- [x] selesai + teruji + termerge · [ ] belum · [~] jalan sekarang
+- [X] selesai + teruji + termerge · [ ] belum · [~] jalan sekarang
 
 ## A. Fondasi eksperimen (selesai)
 
-- [x] C2: scaffold Next 16 + Tailwind + shadcn + dock/number-ticker + build hijau
-- [x] C3: halaman transaksi dummy terang/gelap + banding vs vanilla
-- [x] Struktur rapi: bukti/ gitignore, tools-uji/, README ringkas
+- [X] C2: scaffold Next 16 + Tailwind + shadcn + dock/number-ticker + build hijau
+- [X] C3: halaman transaksi dummy terang/gelap + banding vs vanilla
+- [X] Struktur rapi: bukti/ gitignore, tools-uji/, README ringkas
 
 ## B. Rewrite
 
 ### B1 — Data + 5 halaman baca (selesai)
 
-- [x] lib/db-lokal.ts (kontrak = vanilla) + window guard
-- [x] Dashboard + grafik, Transaksi, Produk, Hutang, Pengaturan (CSV/backup/restore/reset)
-- [x] Migrasi backup vanilla → angka identik (B1-ALL-OK + 5 screenshot)
+- [X] lib/db-lokal.ts (kontrak = vanilla) + window guard
+- [X] Dashboard + grafik, Transaksi, Produk, Hutang, Pengaturan (CSV/backup/restore/reset)
+- [X] Migrasi backup vanilla → angka identik (B1-ALL-OK + 5 screenshot)
 
 ### B2 — Form tulis
 
-- [x] B2.1: form transaksi → db + validasi (B21-ALL-OK)
-- [x] B2.2: bulk + format live + Dialog ubah/hapus (B22-ALL-OK, PR #2)
+- [X] B2.1: form transaksi → db + validasi (B21-ALL-OK)
+- [X] B2.2: bulk + format live + Dialog ubah/hapus (B22-ALL-OK, PR #2)
 
 - [x] B2.2b: chips +00/+000 + format otomatis chips (PR #4 merged)
 
-- [ ] B2.3: hutang tulis + produk CRUD → pindah ke F1.3/F1.4 di bawah
-- [ ] B2.4: validasi UX + uji gabungan → melebur (validasi per F1.x, gabungan = kriteria F1)
-
 ## F1 — Logika & fitur sampai paritas (JALAN SEKARANG)
 
-- [ ] F1.1: catatan inline per transaksi (tambah/ubah/hapus)
+- [~] F1.1: catatan inline per transaksi (PR #6, uji 4/4 hijau)
 - [ ] F1.2: limit harian + setting + mini-stat bulan + preset ?jenis + reset + filter Hari/Bulan + CSV toolbar + footer hitung
 - [ ] F1.3: hutang tulis/bayar/lunas/hapus + progress + tempo (= B2.3 lama, pindah ke sini)
 - [ ] F1.4: produk CRUD + hitung pakai (= sisa B2.3)
