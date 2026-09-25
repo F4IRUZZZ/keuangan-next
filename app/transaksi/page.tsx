@@ -37,7 +37,7 @@ function judul(t: Transaksi, notes: Catatan[]): string {
 }
 
 const CHIPS_TAMBAH = [10000, 50000, 100000, 500000];
-const CHIPS_TEMPEL = ["0", "00"];
+const CHIPS_TEMPEL = ["00", "000"];
 
 export default function TransaksiPage() {
   const [daftar, setDaftar] = useState<Transaksi[]>([]);

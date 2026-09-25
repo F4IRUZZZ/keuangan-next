@@ -32,11 +32,11 @@ const lapor = (n, ok, d) => {
     await page.getByRole("button", { name: "+00", exact: true }).click();
     const chipTempel = await page.$eval("#jml", (el) => el.value);
     if (chipTempel !== "500") throw new Error("chip +00 gagal: " + chipTempel);
-    await page.fill("#jml", "");
-    await page.getByRole("button", { name: "+0", exact: true }).click();
+    await page.fill("#jml", "5");
+    await page.getByRole("button", { name: "+000", exact: true }).click();
     const chipNol = await page.$eval("#jml", (el) => el.value);
-    if (chipNol !== "0") throw new Error("chip +0 gagal: " + chipNol);
-    lapor("chips +10rb/+00/+0 format", true);
+    if (chipNol !== "5.000") throw new Error("chip +000 gagal: " + chipNol);
+    lapor("chips +10rb/+00/+000 format", true);
     await page.locator("#tab-form").getByRole("tab", { name: /^Keluar/ }).click();
     await page.fill("#jml", "13000");
     await page.fill("#kat", "TesUbah");
