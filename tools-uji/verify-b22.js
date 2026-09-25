@@ -96,6 +96,20 @@ const lapor = (n, ok, d) => {
     const footerHari = await page.evaluate(() => document.body.textContent ?? "");
     if (!/Menampilkan \d+ dari \d+ catatan/.test(footerHari)) throw new Error("footer hitung hilang");
     lapor("filter Hari Ini + footer hitung", true);
+    // Aktif eksklusif: Hari Ini on -> Bulan Ini off, dan sebaliknya
+    async function varianAktif(nama) {
+      const cls = await page.getByRole("button", { name: new RegExp("^" + nama + "$") }).getAttribute("class");
+      return /bg-primary/.test(cls ?? "");
+    }
+    if (!(await varianAktif("Hari Ini")) || (await varianAktif("Bulan Ini"))) {
+      throw new Error("Hari Ini on tapi Bulan Ini ikut aktif");
+    }
+    await page.getByRole("button", { name: /^Bulan Ini$/ }).click();
+    await page.waitForTimeout(800);
+    if (!(await varianAktif("Bulan Ini")) || (await varianAktif("Hari Ini"))) {
+      throw new Error("Bulan Ini on tapi Hari Ini ikut aktif");
+    }
+    lapor("pil tanggal aktif eksklusif", true);
     await page.getByRole("button", { name: /^Hari Ini$/ }).click(); // toggle lepas
     const [csvDl] = await Promise.all([
       page.waitForEvent("download", { timeout: 8000 }),
@@ -115,6 +129,30 @@ const lapor = (n, ok, d) => {
     const miniAda = await page.evaluate(() => /Bln Ini/.test(document.body.textContent ?? ""));
     if (!miniAda) throw new Error("mini-stat tak tampil");
     lapor("kartu limit + mini-stat", true);
+    // Issue #9: hitung tab stabil — bersihkan cari dulu, tambah 2 masuk,
+    // klik Keluar, label = total pra-tab (bukan 0 semua)
+    await page.fill('input[placeholder*="Cari kategori"]', "");
+    for (const nominal of ["71000", "72000"]) {
+      await page.locator("#tab-form").getByRole("tab", { name: /^Masuk/ }).click();
+      await page.fill("#jml", nominal);
+      await page.click('button[type="submit"]');
+      await page.waitForFunction(() => /tercatat/.test(document.body.textContent ?? ""), null, { timeout: 10000 });
+    }
+    const totalSemua = await page.evaluate(() => {
+      const m = /Semua \((\d+)\)/.exec(document.body.textContent ?? "");
+      return m ? Number(m[1]) : -1;
+    });
+    await page.locator("#tab-daftar").getByRole("tab", { name: /^Keluar/ }).click();
+    await page.waitForFunction((total) => {
+      const t = document.body.textContent ?? "";
+      const semua = /Semua \((\d+)\)/.exec(t);
+      const masuk = /Masuk \((\d+)\)/.exec(t);
+      const keluar = /Keluar \((\d+)\)/.exec(t);
+      return semua && masuk && keluar &&
+        Number(semua[1]) === total && Number(masuk[1]) === total &&
+        Number(keluar[1]) === 0;
+    }, totalSemua, { timeout: 10000 });
+    lapor("hitung tab stabil saat pindah tab", true);
     const serius = errs.filter((m) => !/favicon/i.test(m));
     lapor("console bersih", serius.length === 0, serius.slice(0, 2).join(" | "));
   } catch (e) {

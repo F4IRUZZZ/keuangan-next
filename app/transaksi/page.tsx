@@ -251,8 +251,7 @@ function IsiTransaksi() {
   }
 
   const kata = cari.trim().toLowerCase();
-  const data = daftar.filter((t) => {
-    if (tab !== "semua" && t.jenis !== tab) return false;
+  function lolosCariTanggal(t: Transaksi): boolean {
     if (cepat && (t.tanggal < cepat.dari || t.tanggal > cepat.sampai)) return false;
     if (!kata) return true;
     const notesT = notes
@@ -265,9 +264,13 @@ function IsiTransaksi() {
       String(t.jumlah).includes(kata) ||
       t.tanggal.includes(kata)
     );
-  });
+  }
+  // Hitungan tab dari pra-tab (cari+tanggal saja) agar stabil saat pindah tab.
+  const dataPraTab = daftar.filter(lolosCariTanggal);
+  const nPraMasuk = dataPraTab.filter((t) => t.jenis === "masuk").length;
+  const data = dataPraTab.filter((t) => tab === "semua" || t.jenis === tab);
   const urut = data.slice().sort((a, b) => (a.tanggal < b.tanggal ? 1 : a.tanggal > b.tanggal ? -1 : b.id - a.id));
-  const nMasuk = data.filter((t) => t.jenis === "masuk").length;
+  const nMasuk = nPraMasuk;
   const subtotal = data.reduce((s, t) => s + Number(t.jumlah), 0);
   const mMasuk = data.filter((t) => t.jenis === "masuk").reduce((s, t) => s + Number(t.jumlah), 0);
   const persenLimit = batas > 0 ? Math.min(100, Math.round((keluarHari / batas) * 100)) : 0;
@@ -416,9 +419,9 @@ function IsiTransaksi() {
         <section className="space-y-4">
           <Tabs value={tab} onValueChange={setTab}>
             <TabsList id="tab-daftar">
-              <TabsTrigger value="semua">Semua ({data.length})</TabsTrigger>
+              <TabsTrigger value="semua">Semua ({dataPraTab.length})</TabsTrigger>
               <TabsTrigger value="masuk">Masuk ({nMasuk})</TabsTrigger>
-              <TabsTrigger value="keluar">Keluar ({data.length - nMasuk})</TabsTrigger>
+              <TabsTrigger value="keluar">Keluar ({dataPraTab.length - nMasuk})</TabsTrigger>
             </TabsList>
           </Tabs>
           <div className="flex flex-wrap gap-2">
@@ -430,7 +433,7 @@ function IsiTransaksi() {
               Hari Ini
             </Button>
             <Button
-              variant={cepat ? "default" : "secondary"}
+              variant={cepat?.dari === awalBulanIni() && cepat?.sampai === akhirBulanIni() ? "default" : "secondary"}
               size="sm"
               onClick={() => toggleCepat("bulan")}
             >
