@@ -1,11 +1,11 @@
 // Verifikasi B1: restore backup vanilla -> banding angka -> screenshot 5 rute.
 const { spawn } = require("child_process");
 const path = require("path");
-const { chromium } = require("D:\\Project Developments\\Webapp Keuangan\\tools\\uji\\node_modules\\playwright-core");
+const { chromium } = require("D:\\Project Developments\\GITHUB\\Webapp Keuangan(Ga Tuntas)\\tools\\uji\\node_modules\\playwright-core");
 
 const PORT = 3002;
 const BASE = `http://localhost:${PORT}`;
-const BACKUP = "D:\\Project Developments\\Webapp Keuangan\\migrasi\\backup-server.json";
+const BACKUP = "D:\\Project Developments\\GITHUB\\Webapp Keuangan(Ga Tuntas)\\migrasi\\backup-server.json";
 const hasil = [];
 const lapor = (n, ok, d) => {
   hasil.push(ok);

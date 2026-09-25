@@ -1,6 +1,6 @@
 // Bukti C3: screenshot Next /transaksi (terang+gelap) vs vanilla /transaksi.
 const { spawn } = require("child_process");
-const { chromium } = require("D:\\Project Developments\\Webapp Keuangan\\tools\\uji\\node_modules\\playwright-core");
+const { chromium } = require("D:\\Project Developments\\GITHUB\\Webapp Keuangan(Ga Tuntas)\\tools\\uji\\node_modules\\playwright-core");
 
 async function tunggu(url) {
   const t0 = Date.now();
@@ -17,7 +17,7 @@ async function tunggu(url) {
 (async () => {
   const next = spawn("npm", ["run", "dev", "--", "--port", "3001"], { cwd: __dirname + "\\..", shell: true });
   const van = spawn("bun", ["run", "tools/depan.ts"], {
-    cwd: "D:\\Project Developments\\Webapp Keuangan",
+    cwd: "D:\\Project Developments\\GITHUB\\Webapp Keuangan(Ga Tuntas)",
     env: Object.assign({}, process.env, { WEB_PORT: "5598" }),
     shell: true,
   });

@@ -5,17 +5,26 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   addCatatan,
   addTransaksi,
+  deleteTransaksi,
   formatRupiah,
   getTransaksi,
   kategoriOf,
   muatSemuaCatatan,
   segarkanCacheProduk,
   tanggalHariIni,
+  updateTransaksi,
   type Catatan,
   type Jenis,
   type Transaksi,
@@ -44,6 +53,22 @@ export default function TransaksiPage() {
   const [pesan, setPesan] = useState("");
   const [pesanOk, setPesanOk] = useState(false);
   const [menyimpan, setMenyimpan] = useState(false);
+  // Bulk hapus (port Set vanilla): id terpilih + bar aksi.
+  const [terpilih, setTerpilih] = useState<Set<number>>(new Set());
+  // Dialog ubah (shadcn) + dialog hapus (konfirmasi).
+  const [ubahId, setUbahId] = useState<number | null>(null);
+  const [ubahTgl, setUbahTgl] = useState("");
+  const [ubahJml, setUbahJml] = useState("");
+  const [ubahKat, setUbahKat] = useState("");
+  const [ubahPesan, setUbahPesan] = useState("");
+  const [hapusId, setHapusId] = useState<number | null>(null);
+
+  // Format live nominal (port pasangFormatRupiahLive): digit -> titik ribuan.
+  // Keterbatasan sama: kursor lompat ke akhir (terdokumentasi).
+  function ketikNominal(v: string) {
+    const digit = v.replace(/[^0-9]/g, "").slice(0, 15);
+    setNominal(digit ? formatRupiah(Number(digit)) : "");
+  }
 
   async function muat() {
     const [d, n, prods] = await Promise.all([
@@ -102,6 +127,74 @@ export default function TransaksiPage() {
     }
   }
 
+  async function hapusMassal() {
+    if (terpilih.size === 0) return;
+    if (!window.confirm(`Hapus ${terpilih.size} transaksi terpilih?`)) return;
+    let ok = 0;
+    const gagal: number[] = [];
+    for (const id of Array.from(terpilih)) {
+      if ((await deleteTransaksi(id)) === true) ok++;
+      else gagal.push(id);
+    }
+    setTerpilih(new Set());
+    await muat();
+    if (gagal.length === 0) {
+      setPesan(`${ok} transaksi dihapus.`);
+      setPesanOk(true);
+    } else {
+      setPesan(`${ok} dihapus, ${gagal.length} gagal (hilang).`);
+      setPesanOk(false);
+    }
+  }
+
+  function bukaUbah(t: Transaksi) {
+    setUbahId(t.id);
+    setUbahTgl(t.tanggal);
+    setUbahJml(formatRupiah(t.jumlah));
+    setUbahKat(kategoriOf(t));
+    setUbahPesan("");
+  }
+
+  async function simpanUbah() {
+    if (ubahId === null) return;
+    const jumlah = Number(String(ubahJml).replace(/[^0-9]/g, "")) || 0;
+    const alvo = daftar.find((t) => t.id === ubahId);
+    const patch: { jumlah: number; tanggal: string; kategori?: string } = {
+      jumlah,
+      tanggal: ubahTgl,
+    };
+    if (alvo?.jenis === "keluar") patch.kategori = ubahKat;
+    const out = await updateTransaksi(ubahId, patch);
+    if (!out) {
+      setUbahPesan("Gagal: transaksi tidak ditemukan.");
+      return;
+    }
+    if (typeof out === "object" && "error" in out) {
+      setUbahPesan(`Gagal (${out.code}): ${out.error}`);
+      return;
+    }
+    setUbahId(null);
+    setPesan(`Transaksi diubah jadi Rp${formatRupiah(jumlah)}.`);
+    setPesanOk(true);
+    await muat();
+  }
+
+  async function jalankanHapus() {
+    if (hapusId === null) return;
+    const t = daftar.find((x) => x.id === hapusId);
+    const out = await deleteTransaksi(hapusId);
+    setHapusId(null);
+    if (!out) {
+      setPesan("Gagal: transaksi tidak ditemukan.");
+      setPesanOk(false);
+      await muat();
+      return;
+    }
+    setPesan(`Transaksi Rp${formatRupiah(t?.jumlah ?? 0)} dihapus.`);
+    setPesanOk(true);
+    await muat();
+  }
+
   const kata = cari.trim().toLowerCase();
   const data = daftar.filter((t) => {
     if (tab !== "semua" && t.jenis !== tab) return false;
@@ -150,7 +243,7 @@ export default function TransaksiPage() {
                   className="text-3xl font-bold"
                   placeholder="contoh: 20000"
                   value={nominal}
-                  onChange={(e) => setNominal(e.target.value)}
+                  onChange={(e) => ketikNominal(e.target.value)}
                 />
                 <div className="mt-2 flex flex-wrap gap-2">
                   {CHIPS.map((c) => (
@@ -213,6 +306,12 @@ export default function TransaksiPage() {
             </TabsList>
           </Tabs>
           <Input placeholder="Cari kategori / catatan / tanggal / nominal" value={cari} onChange={(e) => setCari(e.target.value)} />
+          {!terpilih.size ? null : (
+            <div className="flex items-center gap-2 rounded-xl border p-2 text-sm">
+              <span>{terpilih.size} terpilih.</span>
+              <Button variant="destructive" size="sm" onClick={hapusMassal}>Hapus terpilih</Button>
+            </div>
+          )}
           {urut.length === 0 ? (
             <p className="text-sm text-muted-foreground">Belum ada transaksi yang cocok.</p>
           ) : (
@@ -221,6 +320,20 @@ export default function TransaksiPage() {
                 <li key={t.id}>
                   <Card>
                     <CardContent className="flex items-center gap-3 py-3">
+                      <input
+                        type="checkbox"
+                        className="size-5 shrink-0 accent-emerald-600"
+                        checked={terpilih.has(t.id)}
+                        aria-label={`Pilih transaksi Rp${formatRupiah(t.jumlah)}`}
+                        onChange={(e) => {
+                          setTerpilih((s) => {
+                            const n = new Set(s);
+                            if (e.target.checked) n.add(t.id);
+                            else n.delete(t.id);
+                            return n;
+                          });
+                        }}
+                      />
                       <span className="min-w-0 flex-1">
                         <span className="flex items-center gap-2">
                           <Badge variant={t.jenis === "masuk" ? "default" : "destructive"}>
@@ -235,6 +348,8 @@ export default function TransaksiPage() {
                       <strong className={`whitespace-nowrap text-xl tabular-nums ${t.jenis === "masuk" ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"}`}>
                         {t.jenis === "masuk" ? "+" : "-"}Rp{formatRupiah(t.jumlah)}
                       </strong>
+                      <Button variant="ghost" size="icon" aria-label="Ubah" onClick={() => bukaUbah(t)}>Ubah</Button>
+                      <Button variant="ghost" size="icon" aria-label="Hapus" onClick={() => setHapusId(t.id)}>Hapus</Button>
                     </CardContent>
                   </Card>
                 </li>
@@ -247,12 +362,76 @@ export default function TransaksiPage() {
               : `Subtotal: Rp${formatRupiah(subtotal)}`}{" "}
             - Menampilkan {data.length} dari {daftar.length} catatan
           </p>
+          <label className="flex items-center gap-2 text-sm text-muted-foreground">
+            <input
+              type="checkbox"
+              className="size-5 accent-emerald-600"
+              aria-label="Pilih semua yang tampil"
+              checked={data.length > 0 && data.every((t) => terpilih.has(t.id))}
+              onChange={(e) => {
+                setTerpilih((s) => {
+                  const n = new Set(s);
+                  for (const t of data) {
+                    if (e.target.checked) n.add(t.id);
+                    else n.delete(t.id);
+                  }
+                  return n;
+                });
+              }}
+            />
+            Pilih semua yang tampil
+          </label>
           <p className="text-xs text-muted-foreground">Ubah/hapus via Dialog menyusul di B2.2.</p>
         </section>
       </div>
       <Link href="/pengaturan" className="text-sm font-semibold text-muted-foreground underline">
         Backup / Restore di Pengaturan
       </Link>
+
+      <Dialog open={ubahId !== null} onOpenChange={(b) => { if (!b) setUbahId(null); }}>
+        <DialogContent aria-label="Ubah transaksi">
+          <DialogHeader>
+            <DialogTitle>Ubah transaksi</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <label className="mb-1 block text-sm font-medium" htmlFor="u-tgl">Tanggal baru</label>
+              <Input id="u-tgl" type="date" value={ubahTgl} onChange={(e) => setUbahTgl(e.target.value)} />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium" htmlFor="u-jml">Jumlah baru</label>
+              <Input id="u-jml" inputMode="numeric" value={ubahJml} onChange={(e) => {
+                const digit = e.target.value.replace(/[^0-9]/g, "").slice(0, 15);
+                setUbahJml(digit ? formatRupiah(Number(digit)) : "");
+              }} />
+            </div>
+            {daftar.find((t) => t.id === ubahId)?.jenis === "keluar" && (
+              <div>
+                <label className="mb-1 block text-sm font-medium" htmlFor="u-kat">Kategori baru</label>
+                <Input id="u-kat" value={ubahKat} onChange={(e) => setUbahKat(e.target.value)} />
+              </div>
+            )}
+            {ubahPesan && <p className="text-sm font-semibold text-red-600 dark:text-red-400">{ubahPesan}</p>}
+          </div>
+          <DialogFooter>
+            <Button variant="secondary" onClick={() => setUbahId(null)}>Batal</Button>
+            <Button onClick={simpanUbah}>Simpan</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={hapusId !== null} onOpenChange={(b) => { if (!b) setHapusId(null); }}>
+        <DialogContent aria-label="Hapus transaksi">
+          <DialogHeader>
+            <DialogTitle>Hapus transaksi ini?</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">Catatan yang menempel ikut terhapus. Tindakan ini tidak bisa dibatalkan.</p>
+          <DialogFooter>
+            <Button variant="secondary" onClick={() => setHapusId(null)}>Batal</Button>
+            <Button variant="destructive" onClick={jalankanHapus}>Hapus</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </main>
   );
 }
