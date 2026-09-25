@@ -23,7 +23,20 @@ const lapor = (n, ok, d) => {
     const live = await page.$eval("#jml", (el) => el.value);
     if (live !== "5.000") throw new Error("format live gagal: " + live);
     lapor("format live 5000 -> 5.000", true);
-    // Baris edit-target: tulis 1 (DB fresh, daftar kosong sebelumnya)
+    // Chips B2.2b: +10rb dari kosong -> 10.000; 5 + +00 -> 500; +0 no-op
+    await page.fill("#jml", "");
+    await page.getByRole("button", { name: "+10rb" }).click();
+    const chipTambah = await page.$eval("#jml", (el) => el.value);
+    if (chipTambah !== "10.000") throw new Error("chip +10rb gagal: " + chipTambah);
+    await page.fill("#jml", "5");
+    await page.getByRole("button", { name: "+00", exact: true }).click();
+    const chipTempel = await page.$eval("#jml", (el) => el.value);
+    if (chipTempel !== "500") throw new Error("chip +00 gagal: " + chipTempel);
+    await page.fill("#jml", "");
+    await page.getByRole("button", { name: "+0", exact: true }).click();
+    const chipNol = await page.$eval("#jml", (el) => el.value);
+    if (chipNol !== "0") throw new Error("chip +0 gagal: " + chipNol);
+    lapor("chips +10rb/+00/+0 format", true);
     await page.locator("#tab-form").getByRole("tab", { name: /^Keluar/ }).click();
     await page.fill("#jml", "13000");
     await page.fill("#kat", "TesUbah");
