@@ -143,7 +143,8 @@ export default function HutangPage() {
 
   const data = daftar.filter((h) => tab === "semua" || h.arah === tab);
   const sisa = (h: Hutang) => h.jumlah - h.dibayar;
-  const subtotal = data.reduce((s, h) => s + sisa(h), 0);
+  const subHutang = data.filter((h) => h.arah === "hutang").reduce((s, h) => s + sisa(h), 0);
+  const subPiutang = data.filter((h) => h.arah === "piutang").reduce((s, h) => s + sisa(h), 0);
   const hariIni = tanggalHariIni();
   const bayarH = daftar.find((h) => h.id === bayarId);
 
@@ -224,6 +225,9 @@ export default function HutangPage() {
                 <li key={h.id} className="rounded-xl border p-3">
                   <div className="flex items-center gap-2">
                     <strong className="min-w-0 flex-1 truncate">{h.pihak}</strong>
+                    <Badge variant={h.arah === "hutang" ? "destructive" : "default"}>
+                      {h.arah === "hutang" ? "HUTANG" : "PIUTANG"}
+                    </Badge>
                     <Badge variant={h.status === "lunas" ? "default" : "secondary"}>
                       {h.status === "lunas" ? "Lunas" : "Belum"}
                     </Badge>
@@ -253,7 +257,9 @@ export default function HutangPage() {
               ))}
             </ul>
           )}
-          <p className="text-sm text-muted-foreground">Sisa total: Rp{formatRupiah(subtotal)}</p>
+          <p className="text-sm text-muted-foreground">
+            Sisa hutang: Rp{formatRupiah(subHutang)} - Sisa piutang: Rp{formatRupiah(subPiutang)}
+          </p>
         </section>
       </div>
 

@@ -62,6 +62,22 @@ const lapor = (n, ok, d) => {
     await page.locator('[role="dialog"]').getByRole("button", { name: "Hapus" }).click();
     await page.waitForFunction(() => /Catatan dihapus/.test(document.body.textContent ?? ""), null, { timeout: 10000 });
     lapor("hapus baris belum via dialog", true);
+    // Badge arah + subtotal terpecah: 1 hutang + 1 piutang
+    await page.locator("#tab-arah").getByRole("tab", { name: /^Hutang/ }).click();
+    await page.fill("#pihak", "ArahH");
+    await page.fill("#jml-hutang", "30000");
+    await page.click('button[type="submit"]');
+    await page.waitForFunction(() => /ArahH/.test(document.body.textContent ?? ""), null, { timeout: 10000 });
+    await page.locator("#tab-arah").getByRole("tab", { name: /^Piutang/ }).click();
+    await page.fill("#pihak", "ArahP");
+    await page.fill("#jml-hutang", "70000");
+    await page.click('button[type="submit"]');
+    await page.waitForFunction(() => /ArahP/.test(document.body.textContent ?? ""), null, { timeout: 10000 });
+    await page.waitForFunction(() => {
+      const t = document.body.textContent ?? "";
+      return /HUTANG/.test(t) && /PIUTANG/.test(t) && /Sisa hutang: Rp30\.000/.test(t) && /Sisa piutang: Rp70\.000/.test(t);
+    }, null, { timeout: 10000 });
+    lapor("badge arah + subtotal terpecah", true);
     const serius = errs.filter((m) => !/favicon/i.test(m));
     lapor("console bersih", serius.length === 0, serius.slice(0, 2).join(" | "));
   } catch (e) {
