@@ -64,7 +64,9 @@ const lapor = (n, ok, d) => {
       await page.click('button[type="submit"]');
       await page.waitForFunction(() => /tercatat/.test(document.body.textContent ?? ""), null, { timeout: 10000 });
     }
-    // Bulk: filter cari -> pilih semua tampil -> hapus
+    // Bulk: buka Cari dulu (toggle), filter, pilih semua tampil, hapus
+    await page.getByRole("button", { name: /^Cari$/ }).click();
+    await page.waitForSelector('input[placeholder*="Cari kategori"]', { timeout: 8000 });
     await page.fill('input[placeholder*="Cari kategori"]', "TesBulk");
     await page.waitForFunction(
       () => (document.querySelectorAll('li input[type="checkbox"]').length ?? 0) >= 2,
@@ -129,9 +131,19 @@ const lapor = (n, ok, d) => {
     const miniAda = await page.evaluate(() => /Bln Ini/.test(document.body.textContent ?? ""));
     if (!miniAda) throw new Error("mini-stat tak tampil");
     lapor("kartu limit + mini-stat", true);
-    // Issue #9: hitung tab stabil — bersihkan cari dulu, tambah 2 masuk,
+    // Search toggle: buka -> fokus + filter jalan; Esc tutup tapi filter tetap
+    const cariAwal = await page.$('input[placeholder*="Cari kategori"]');
+    if (cariAwal) throw new Error("search harus sembunyi awalnya");
+    await page.getByRole("button", { name: /^Cari$/ }).click();
+    await page.waitForSelector('input[placeholder*="Cari kategori"]', { timeout: 8000 });
+    await page.fill('input[placeholder*="Cari kategori"]', "TesBulk");
+    await page.waitForFunction(() => /Menampilkan 0 dari \d+ catatan/.test(document.body.textContent ?? ""), null, { timeout: 10000 });
+    await page.keyboard.press("Escape");
+    await page.waitForFunction(() => !document.querySelector('input[placeholder*="Cari kategori"]'), null, { timeout: 8000 });
+    await page.waitForFunction(() => /Menampilkan 0 dari \d+ catatan/.test(document.body.textContent ?? ""), null, { timeout: 10000 });
+    lapor("search toggle + filter persisten", true);
+    // Issue #9: hitung tab stabil — tambah 2 masuk (DB uji kosong di titik ini),
     // klik Keluar, label = total pra-tab (bukan 0 semua)
-    await page.fill('input[placeholder*="Cari kategori"]', "");
     for (const nominal of ["71000", "72000"]) {
       await page.locator("#tab-form").getByRole("tab", { name: /^Masuk/ }).click();
       await page.fill("#jml", nominal);

@@ -4,6 +4,13 @@ import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import {
   formatRupiah,
@@ -43,6 +50,7 @@ function selCSV(teks: unknown): string {
 export default function PengaturanPage() {
   const [hasil, setHasil] = useState("");
   const [batasTeks, setBatasTeks] = useState("");
+  const [konfirmHapus, setKonfirmHapus] = useState(false);
 
   useEffect(() => {
     const kini = getBatasHarian();
@@ -99,9 +107,8 @@ export default function PengaturanPage() {
   }
 
   async function hapus() {
-    if (!window.confirm("Hapus SEMUA data di perangkat ini?")) return;
-    if (!window.confirm("Yakin? Backup dulu bila perlu.")) return;
     await hapusSemuaData();
+    setKonfirmHapus(false);
     setHasil("Semua data dihapus.");
   }
 
@@ -146,9 +153,25 @@ export default function PengaturanPage() {
       </Card>
       <Card>
         <CardHeader><CardTitle>Zona Bahaya</CardTitle></CardHeader>
-        <CardContent><Button variant="destructive" onClick={hapus}>Hapus Semua Data di Perangkat Ini</Button></CardContent>
+        <CardContent><Button variant="destructive" onClick={() => setKonfirmHapus(true)}>Hapus Semua Data di Perangkat Ini</Button></CardContent>
       </Card>
       {hasil && <p className="text-sm text-muted-foreground">{hasil}</p>}
+
+      <Dialog open={konfirmHapus} onOpenChange={setKonfirmHapus}>
+        <DialogContent aria-label="Hapus semua data">
+          <DialogHeader>
+            <DialogTitle>Hapus SEMUA data di perangkat ini?</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            Produk, transaksi, catatan, hutang, batas harian, dan tema ikut terhapus.
+            Backup dulu bila perlu — tindakan ini tidak bisa dibatalkan.
+          </p>
+          <DialogFooter>
+            <Button variant="secondary" onClick={() => setKonfirmHapus(false)}>Batal</Button>
+            <Button variant="destructive" onClick={hapus}>Ya, hapus semua</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </main>
   );
 }
