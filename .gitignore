@@ -42,3 +42,6 @@ next-env.d.ts
 
 # log server uji lokal
 *.log
+
+# bukti screenshot uji lokal (lihat folder bukti/ di disk)
+bukti/

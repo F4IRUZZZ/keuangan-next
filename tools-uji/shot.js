@@ -23,10 +23,10 @@ const { chromium } = require("D:\\Project Developments\\GITHUB\\Webapp Keuangan(
   try {
     await page.goto("http://localhost:3001/", { waitUntil: "load" });
     await page.waitForTimeout(1500);
-    await page.screenshot({ path: "bukti-next-bawaan.png" });
+    await page.screenshot({ path: "bukti/bukti-next-bawaan.png" });
     await page.goto("http://localhost:3001/coba-komponen", { waitUntil: "load" });
     await page.waitForTimeout(2000);
-    await page.screenshot({ path: "bukti-next-komponen.png" });
+    await page.screenshot({ path: "bukti/bukti-next-komponen.png" });
     console.log("SCREENSHOT-OK errs=" + errs.length);
     if (errs.length) console.log(errs.slice(0, 3).join(" | "));
   } finally {

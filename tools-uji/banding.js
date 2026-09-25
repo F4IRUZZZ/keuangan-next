@@ -34,16 +34,16 @@ async function tunggu(url) {
     await page.waitForSelector("h1", { timeout: 120000 });
     await page.waitForTimeout(2500);
     await page.$eval("#list-atau-form", (el) => el && el.scrollIntoView()).catch(() => {});
-    await page.screenshot({ path: "bukti-next-transaksi-terang.png" });
+    await page.screenshot({ path: "bukti/bukti-next-transaksi-terang.png" });
     const tema = await page.$('button[aria-label="Ganti tema"]');
     if (tema) {
       await tema.click();
       await page.waitForTimeout(800);
-      await page.screenshot({ path: "bukti-next-transaksi-gelap.png" });
+      await page.screenshot({ path: "bukti/bukti-next-transaksi-gelap.png" });
     }
     await page.goto("http://localhost:5598/transaksi", { waitUntil: "load", timeout: 60000 });
     await page.waitForTimeout(1500);
-    await page.screenshot({ path: "bukti-vanilla-transaksi.png" });
+    await page.screenshot({ path: "bukti/bukti-vanilla-transaksi.png" });
     console.log("BANDING-OK errs=" + errs.length);
     if (errs.length) console.log(errs.slice(0, 3).join(" | "));
   } finally {

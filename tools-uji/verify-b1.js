@@ -58,7 +58,7 @@ const lapor = (n, ok, d) => {
     for (const [nama, url] of [["dash", "/"], ["trx", "/transaksi"], ["prd", "/produk"], ["htg", "/hutang"], ["set", "/pengaturan"]]) {
       await page.goto(`${BASE}${url}`, { waitUntil: "load", timeout: 60000 });
       await page.waitForTimeout(800);
-      await page.screenshot({ path: `bukti-b1-${nama}.png` });
+      await page.screenshot({ path: `bukti/bukti-b1-${nama}.png` });
     }
     lapor("screenshot 5 rute", true);
     const serius = errs.filter((m) => !/favicon/i.test(m));
