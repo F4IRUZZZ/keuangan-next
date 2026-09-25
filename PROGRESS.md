@@ -71,3 +71,26 @@
 
 - Fase 0–4, M1–M4, DompetKu-1/2, TxFull-1–4, SW v12, uji 16/16 — detail:
   repo lama `planning-webapp-keuangan.md` + cabang `arsip-server-v1`
+
+## E. Antrean Usulan (usulan tengah jalan — dinilai dulu, baru dicatat)
+
+> Alur: usul kapan saja → saya bedah dampak vs fase berjalan →
+> DITERIMA (masuk fase sebagai item baru) atau DITOLAK beralasan
+> (tetap tercatat, bisa dibuka lagi). Darurat: nyatakan eksplisit.
+
+_Belum ada usulan._
+
+## F. Riwayat Perubahan (per PR/commit fitur, terbaru di atas)
+
+| Tanggal | Perubahan | Uji | PR |
+|---|---|---|---|
+| 2026-09-25 | Rapikan PROGRESS (B2.3/B2.4 pindah F1, samakan checkbox) + phasing F1–F4 | - (docs) | - |
+| 2026-09-25 | Nav bawah HP/tablet + font Geist + padding konten | viewport 390/1280, console bersih | #4 |
+| 2026-09-25 | B2.2b chips +0/+00→+00/+000 + format 1 pintu | B22 6/6, tsc, build | #4 |
+| 2026-09-25 | PROGRESS.md dibuat (status + B5 + backlog) | - (docs) | - |
+| 2026-09-25 | B2.2 bulk + format live + Dialog ubah/hapus | B22 5/5, tsc, build | #2 |
+| 2026-09-25 | Rapikan struktur (bukti/, tools-uji/, README) | verify-b22 hijau pasca-rename | - |
+| 2026-09-25 | B2.1 form transaksi → db + validasi | B21 4/4 | - |
+| 2026-09-24 | B1 port db-lokal TS + 5 halaman baca + migrasi backup identik | B1-ALL-OK, 5 screenshot | - |
+| 2026-09-24 | C3 halaman transaksi dummy + banding vs vanilla | screenshot terang/gelap | - |
+| 2026-09-24 | C2 scaffold Next + shadcn + dock/number-ticker | tsc + build | - |
