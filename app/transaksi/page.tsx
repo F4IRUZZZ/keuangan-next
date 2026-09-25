@@ -36,7 +36,8 @@ function judul(t: Transaksi, notes: Catatan[]): string {
   return `${t.jenis === "masuk" ? "Masuk" : "Keluar"} - ${kategoriOf(t)}`;
 }
 
-const CHIPS = [10000, 50000, 100000, 500000];
+const CHIPS_TAMBAH = [10000, 50000, 100000, 500000];
+const CHIPS_TEMPEL = ["00", "000"];
 
 export default function TransaksiPage() {
   const [daftar, setDaftar] = useState<Transaksi[]>([]);
@@ -63,11 +64,17 @@ export default function TransaksiPage() {
   const [ubahPesan, setUbahPesan] = useState("");
   const [hapusId, setHapusId] = useState<number | null>(null);
 
+  // Tulis nominal 1 pintu (DRY B2.2b): semua jalur (ketik, tambah, tempel)
+  // lewat sini -> selalu tampil format ribuan. Maks 15 digit.
+  function tulisNominalDariDigit(digit: string) {
+    const potong = digit.replace(/[^0-9]/g, "").slice(0, 15);
+    setNominal(potong ? formatRupiah(Number(potong)) : "");
+  }
+
   // Format live nominal (port pasangFormatRupiahLive): digit -> titik ribuan.
   // Keterbatasan sama: kursor lompat ke akhir (terdokumentasi).
   function ketikNominal(v: string) {
-    const digit = v.replace(/[^0-9]/g, "").slice(0, 15);
-    setNominal(digit ? formatRupiah(Number(digit)) : "");
+    tulisNominalDariDigit(v);
   }
 
   async function muat() {
@@ -246,13 +253,24 @@ export default function TransaksiPage() {
                   onChange={(e) => ketikNominal(e.target.value)}
                 />
                 <div className="mt-2 flex flex-wrap gap-2">
-                  {CHIPS.map((c) => (
+                  {CHIPS_TEMPEL.map((nol) => (
+                    <Button
+                      key={"t" + nol}
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => tulisNominalDariDigit(String(nominal.replace(/[^0-9]/g, "")) + nol)}
+                    >
+                      +{nol}
+                    </Button>
+                  ))}
+                  {CHIPS_TAMBAH.map((c) => (
                     <Button
                       key={c}
                       type="button"
                       variant="secondary"
                       size="sm"
-                      onClick={() => setNominal(String((Number(nominal.replace(/[^0-9]/g, "")) || 0) + c))}
+                      onClick={() => tulisNominalDariDigit(String((Number(nominal.replace(/[^0-9]/g, "")) || 0) + c))}
                     >
                       +{c / 1000}rb
                     </Button>

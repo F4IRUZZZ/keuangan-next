@@ -27,7 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     >
       <body className="min-h-full flex flex-col">
         <Nav />
-        {children}
+        <div className="pb-24 lg:pb-0">{children}</div>
       </body>
     </html>
   );
