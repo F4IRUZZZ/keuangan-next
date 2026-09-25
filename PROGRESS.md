@@ -36,6 +36,7 @@
 - [ ] F1.3: hutang tulis/bayar/lunas/hapus + progress + tempo (= B2.3 lama, pindah ke sini)
 - [ ] F1.4: produk CRUD + hitung pakai (= sisa B2.3)
 - [ ] F1.5: dashboard riwayat ringkas + grafik mingguan
+- [ ] F1.6: menu Riwayat terpisah (tab Transaksi | Hutang, baca-saja; dashboard tetap 5 + link) — dieksekusi setelah F1.5
 
 - Kriteria: semua skenario vanilla lolos di `:3000`.
 
