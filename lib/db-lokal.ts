@@ -649,6 +649,13 @@ export async function imporBackup(data: {
 export async function hapusSemuaData(): Promise<void> {
   for (const s of ["produk", "transaksi", "catatan", "hutang"]) await dbKosongkan(s);
   cacheProduk = [];
+  // Zona Bahaya = benar-benar semua: setting lokal ikut dibuang.
+  try {
+    window.localStorage.removeItem("batasHarian");
+    window.localStorage.removeItem("tema");
+  } catch {
+    /* abaikan (SSR) */
+  }
 }
 
 export function formatRupiah(n: number): string {

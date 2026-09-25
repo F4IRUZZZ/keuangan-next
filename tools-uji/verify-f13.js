@@ -13,6 +13,7 @@ const lapor = (n, ok, d) => {
 (async () => {
   const browser = await chromium.launch();
   const page = await (await browser.newContext()).newPage();
+  page.on("dialog", (d) => d.accept()); // confirm() zona bahaya (2x)
   const errs = [];
   page.on("pageerror", (e) => errs.push(e.message));
   try {
@@ -78,6 +79,17 @@ const lapor = (n, ok, d) => {
       return /HUTANG/.test(t) && /PIUTANG/.test(t) && /Sisa hutang: Rp30\.000/.test(t) && /Sisa piutang: Rp70\.000/.test(t);
     }, null, { timeout: 10000 });
     lapor("badge arah + subtotal terpecah", true);
+    // Zona Bahaya: set batas -> hapus semua -> batas ikut hilang
+    await page.goto(`${BASE}/pengaturan`, { waitUntil: "load", timeout: 120000 });
+    await page.fill("#batas", "123456");
+    await page.getByRole("button", { name: /^Simpan Batas$/ }).click();
+    await page.waitForFunction(() => /Batas disimpan/.test(document.body.textContent ?? ""), null, { timeout: 10000 });
+    await page.getByRole("button", { name: /Hapus Semua Data/ }).click();
+    await page.getByRole("button", { name: /Hapus Semua Data/ }).click();
+    await page.waitForFunction(() => /Semua data dihapus/.test(document.body.textContent ?? ""), null, { timeout: 10000 });
+    const sisaBatas = await page.evaluate(() => window.localStorage.getItem("batasHarian"));
+    if (sisaBatas !== null) throw new Error("batasHarian masih ada: " + sisaBatas);
+    lapor("zona bahaya hapus batas juga", true);
     const serius = errs.filter((m) => !/favicon/i.test(m));
     lapor("console bersih", serius.length === 0, serius.slice(0, 2).join(" | "));
   } catch (e) {

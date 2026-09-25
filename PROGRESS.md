@@ -42,6 +42,7 @@
 
 ## F2 — Desain & layout belakangan
 
+- [ ] F2.0 (pertama): sidebar kiri + logo pojok kiri atas (desktop; HP tetap bottom-nav) + logo di manifest/favicon
 - [ ] Dock final + hero + tema terang/gelap polish + audit spacing/typography
 - [ ] Palet, breadcrumb, dark toggle, koma-titik id-ID, font Geist (= B4 lama, pindah ke sini)
 - [ ] Uji paritas visual vs referensi (screenshot 2 tema)
