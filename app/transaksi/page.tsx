@@ -55,6 +55,7 @@ function IsiTransaksi() {
   const [saran, setSaran] = useState<string[]>([]);
   const [tab, setTab] = useState("semua");
   const [cari, setCari] = useState("");
+  const [cariBuka, setCariBuka] = useState(false);
   const [cepat, setCepat] = useState<{ dari: string; sampai: string } | null>(null);
   const [saldoBulan, setSaldoBulan] = useState<Saldo>({ masuk: 0, keluar: 0, saldo: 0 });
   const [keluarHari, setKeluarHari] = useState(0);
@@ -439,7 +440,17 @@ function IsiTransaksi() {
             >
               Bulan Ini
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => refCari.current?.focus()}>
+            <Button
+              variant={cariBuka ? "default" : "ghost"}
+              size="sm"
+              aria-expanded={cariBuka}
+              onClick={() => {
+                setCariBuka((b) => {
+                  if (!b) setTimeout(() => refCari.current?.focus(), 0);
+                  return !b;
+                });
+              }}
+            >
               Cari
             </Button>
             <Button variant="secondary" size="sm" onClick={unduhCSVToolbar}>
@@ -465,12 +476,17 @@ function IsiTransaksi() {
               Pilih semua
             </label>
           </div>
-          <Input
-            ref={refCari}
-            placeholder="Cari kategori / catatan / tanggal / nominal"
-            value={cari}
-            onChange={(e) => setCari(e.target.value)}
-          />
+          {!cariBuka ? null : (
+            <Input
+              ref={refCari}
+              placeholder="Cari kategori / catatan / tanggal / nominal"
+              value={cari}
+              onChange={(e) => setCari(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Escape") setCariBuka(false);
+              }}
+            />
+          )}
           {!terpilih.size ? null : (
             <div className="flex items-center gap-2 rounded-xl border p-2 text-sm">
               <span>{terpilih.size} terpilih.</span>
