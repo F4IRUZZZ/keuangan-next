@@ -27,7 +27,7 @@
 - [x] B2.1: form transaksi → db + validasi (B21-ALL-OK)
 - [x] B2.2: bulk + format live + Dialog ubah/hapus (B22-ALL-OK, PR #2)
 
-- [~] B2.2b: chips +0/+00 + format otomatis chips (PR #4, uji 6/6 hijau)
+- [x] B2.2b: chips +00/+000 + format otomatis chips (PR #4 merged)
 
 - [ ] B2.3: hutang tulis + produk CRUD → pindah ke F1.3/F1.4 di bawah
 - [ ] B2.4: validasi UX + uji gabungan → melebur (validasi per F1.x, gabungan = kriteria F1)
@@ -84,6 +84,7 @@ _Belum ada usulan._
 
 | Tanggal | Perubahan | Uji | PR |
 |---|---|---|---|
+| 2026-09-25 | B2.2b merged: chips +00/+000 + nav bawah + font Geist | B22 6/6, viewport, tsc, build | #4 |
 | 2026-09-25 | Rapikan PROGRESS (B2.3/B2.4 pindah F1, samakan checkbox) + phasing F1–F4 | - (docs) | - |
 | 2026-09-25 | Nav bawah HP/tablet + font Geist + padding konten | viewport 390/1280, console bersih | #4 |
 | 2026-09-25 | B2.2b chips +0/+00→+00/+000 + format 1 pintu | B22 6/6, tsc, build | #4 |
