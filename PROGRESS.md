@@ -27,7 +27,7 @@
 - [X] B2.1: form transaksi → db + validasi (B21-ALL-OK)
 - [X] B2.2: bulk + format live + Dialog ubah/hapus (B22-ALL-OK, PR #2)
 
-- [~] B2.2b: chips +0/+00 + format otomatis chips (PR #4, uji 6/6 hijau)
+- [x] B2.2b: chips +00/+000 + format otomatis chips (PR #4 merged)
 
 ## F1 — Logika & fitur sampai paritas (JALAN SEKARANG)
 
@@ -79,15 +79,16 @@ _Belum ada usulan._
 
 ## F. Riwayat Perubahan (per PR/commit fitur, terbaru di atas)
 
-| Tanggal    | Perubahan                                                                 | Uji                               | PR |
-| ---------- | ------------------------------------------------------------------------- | --------------------------------- | -- |
-| 2026-09-25 | Rapikan PROGRESS (B2.3/B2.4 pindah F1, samakan checkbox) + phasing F1–F4 | - (docs)                          | -  |
-| 2026-09-25 | Nav bawah HP/tablet + font Geist + padding konten                         | viewport 390/1280, console bersih | #4 |
-| 2026-09-25 | B2.2b chips +0/+00→+00/+000 + format 1 pintu                             | B22 6/6, tsc, build               | #4 |
-| 2026-09-25 | PROGRESS.md dibuat (status + B5 + backlog)                                | - (docs)                          | -  |
-| 2026-09-25 | B2.2 bulk + format live + Dialog ubah/hapus                               | B22 5/5, tsc, build               | #2 |
-| 2026-09-25 | Rapikan struktur (bukti/, tools-uji/, README)                             | verify-b22 hijau pasca-rename     | -  |
-| 2026-09-25 | B2.1 form transaksi → db + validasi                                      | B21 4/4                           | -  |
-| 2026-09-24 | B1 port db-lokal TS + 5 halaman baca + migrasi backup identik             | B1-ALL-OK, 5 screenshot           | -  |
-| 2026-09-24 | C3 halaman transaksi dummy + banding vs vanilla                           | screenshot terang/gelap           | -  |
-| 2026-09-24 | C2 scaffold Next + shadcn + dock/number-ticker                            | tsc + build                       | -  |
+| Tanggal | Perubahan | Uji | PR |
+|---|---|---|---|
+| 2026-09-25 | B2.2b merged: chips +00/+000 + nav bawah + font Geist | B22 6/6, viewport, tsc, build | #4 |
+| 2026-09-25 | Rapikan PROGRESS (B2.3/B2.4 pindah F1, samakan checkbox) + phasing F1–F4 | - (docs) | - |
+| 2026-09-25 | Nav bawah HP/tablet + font Geist + padding konten | viewport 390/1280, console bersih | #4 |
+| 2026-09-25 | B2.2b chips +0/+00→+00/+000 + format 1 pintu | B22 6/6, tsc, build | #4 |
+| 2026-09-25 | PROGRESS.md dibuat (status + B5 + backlog) | - (docs) | - |
+| 2026-09-25 | B2.2 bulk + format live + Dialog ubah/hapus | B22 5/5, tsc, build | #2 |
+| 2026-09-25 | Rapikan struktur (bukti/, tools-uji/, README) | verify-b22 hijau pasca-rename | - |
+| 2026-09-25 | B2.1 form transaksi → db + validasi | B21 4/4 | - |
+| 2026-09-24 | B1 port db-lokal TS + 5 halaman baca + migrasi backup identik | B1-ALL-OK, 5 screenshot | - |
+| 2026-09-24 | C3 halaman transaksi dummy + banding vs vanilla | screenshot terang/gelap | - |
+| 2026-09-24 | C2 scaffold Next + shadcn + dock/number-ticker | tsc + build | - |
