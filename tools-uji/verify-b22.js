@@ -96,6 +96,20 @@ const lapor = (n, ok, d) => {
     const footerHari = await page.evaluate(() => document.body.textContent ?? "");
     if (!/Menampilkan \d+ dari \d+ catatan/.test(footerHari)) throw new Error("footer hitung hilang");
     lapor("filter Hari Ini + footer hitung", true);
+    // Aktif eksklusif: Hari Ini on -> Bulan Ini off, dan sebaliknya
+    async function varianAktif(nama) {
+      const cls = await page.getByRole("button", { name: new RegExp("^" + nama + "$") }).getAttribute("class");
+      return /bg-primary/.test(cls ?? "");
+    }
+    if (!(await varianAktif("Hari Ini")) || (await varianAktif("Bulan Ini"))) {
+      throw new Error("Hari Ini on tapi Bulan Ini ikut aktif");
+    }
+    await page.getByRole("button", { name: /^Bulan Ini$/ }).click();
+    await page.waitForTimeout(800);
+    if (!(await varianAktif("Bulan Ini")) || (await varianAktif("Hari Ini"))) {
+      throw new Error("Bulan Ini on tapi Hari Ini ikut aktif");
+    }
+    lapor("pil tanggal aktif eksklusif", true);
     await page.getByRole("button", { name: /^Hari Ini$/ }).click(); // toggle lepas
     const [csvDl] = await Promise.all([
       page.waitForEvent("download", { timeout: 8000 }),

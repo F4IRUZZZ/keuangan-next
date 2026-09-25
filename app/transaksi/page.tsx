@@ -433,7 +433,7 @@ function IsiTransaksi() {
               Hari Ini
             </Button>
             <Button
-              variant={cepat ? "default" : "secondary"}
+              variant={cepat?.dari === awalBulanIni() && cepat?.sampai === akhirBulanIni() ? "default" : "secondary"}
               size="sm"
               onClick={() => toggleCepat("bulan")}
             >
