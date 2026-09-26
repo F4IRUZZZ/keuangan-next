@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -24,9 +25,19 @@ export function Nav() {
   const path = usePathname();
   return (
     <>
-      {/* Laptop: bar atas (tak berubah) */}
-      <nav aria-label="Navigasi utama" className="sticky top-0 z-40 hidden border-b bg-background/90 backdrop-blur lg:block">
-        <div className="mx-auto flex w-full max-w-6xl gap-1 overflow-x-auto p-2">
+      {/* Laptop: sidebar kiri (logo + link vertikal) */}
+      <nav aria-label="Navigasi utama" className="fixed inset-y-0 left-0 z-40 hidden w-60 flex-col border-r bg-background/95 backdrop-blur lg:flex">
+        <Link href="/" className="flex items-center gap-3 px-4 pt-5 pb-4">
+          <Image
+            src="/logo-sumber.png"
+            alt="Logo FamVault"
+            width={40}
+            height={40}
+            className="size-10 rounded-xl"
+          />
+          <span className="text-lg font-bold">FamVault</span>
+        </Link>
+        <div className="flex flex-col gap-1 px-2">
           {NAV.map((n) => {
             const aktif = n.href === "/" ? path === "/" : path.startsWith(n.href);
             return (
@@ -34,10 +45,11 @@ export function Nav() {
                 key={n.href}
                 href={n.href}
                 aria-current={aktif ? "page" : undefined}
-                className={`rounded-lg px-3 py-2 text-sm font-semibold whitespace-nowrap ${
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold ${
                   aktif ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"
                 }`}
               >
+                <n.ikon className="size-5" aria-hidden="true" />
                 {n.label}
               </Link>
             );
