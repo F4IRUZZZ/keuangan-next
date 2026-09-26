@@ -84,6 +84,7 @@ _Belum ada usulan._
 
 | Tanggal | Perubahan | Uji | PR |
 |---|---|---|---|
+| 2026-09-27 | F1.5c merged: kunci tinggi chart h-64 (dari ~540px) | screenshot 1056x256, F15 ALL-OK, tsc | #26 |
 | 2026-09-27 | F1.5b merged: 3 grafik jadi 1 frame 3 tab (Arus\|Mingguan\|Kategori) | F15 9/9, screenshot 3 tab, tsc | #24 |
 | 2026-09-27 | Fix tooltip RpNaN: parsed.y (semantik vanilla) | screenshot hover Rp45.000, F15 ALL-OK, tsc | #22 |
 | 2026-09-27 | Fix donat kebesaran: batasi 560px tengah (paritas vanilla) | screenshot 528px, F15 ALL-OK, tsc | #20 |
