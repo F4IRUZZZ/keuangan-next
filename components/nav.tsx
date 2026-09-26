@@ -29,7 +29,7 @@ export function Nav() {
       <nav aria-label="Navigasi utama" className="fixed inset-y-0 left-0 z-40 hidden w-60 flex-col border-r bg-background/95 backdrop-blur lg:flex">
         <Link href="/" className="flex items-center gap-3 px-4 pt-5 pb-4">
           <Image
-            src="/logo-sumber.png"
+            src="/logo-nav.png"
             alt="Logo FamVault"
             width={40}
             height={40}

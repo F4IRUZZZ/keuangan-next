@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -15,6 +15,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "FamVault",
   description: "Catat pendapatan dan pengeluaran pribadi + keluarga",
+};
+
+export const viewport: Viewport = {
+  themeColor: "#059669",
 };
 
 import { Nav } from "@/components/nav";
