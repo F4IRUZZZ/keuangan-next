@@ -67,13 +67,21 @@ function isoSeninPlus(offset) {
     await isiKeluar(isoSeninPlus(0), "20000", "TesSenin");
     await isiKeluar(isoSeninPlus(2), "30000", "TesRabu");
     await page.goto(`${BASE}/`, { waitUntil: "load", timeout: 120000 });
-    // Kanvas ter-render dan punya tinggi (arus + minggu + donat)
-    for (const id of ["#grafik-arus", "#grafik-minggu", "#grafik-kategori"]) {
+    // Tab grafik: default Arus, pindah tiap tab -> kanvas ter-render
+    async function assertKanvas(id) {
       const box = await page.waitForSelector(id, { timeout: 8000 }).then((el) => el.boundingBox());
       if (!box || box.height < 50) throw new Error(`${id} tak ter-render`);
     }
-    lapor("3 grafik ter-render", true);
-    // Ganti periode tak boleh meruntuhkan grafik (destroy/recreate stabil)
+    const tabAwal = await page.getByRole("tab", { selected: true }).textContent();
+    if ((tabAwal ?? "").trim() !== "Arus") throw new Error("tab default bukan Arus: " + tabAwal);
+    await assertKanvas("#grafik-arus");
+    await page.getByRole("tab", { name: "Mingguan", exact: true }).click();
+    await assertKanvas("#grafik-minggu");
+    await page.getByRole("tab", { name: "Kategori", exact: true }).click();
+    await assertKanvas("#grafik-kategori");
+    lapor("3 tab grafik ter-render", true);
+    // Ganti periode di tab Mingguan tak boleh meruntuhkan grafik (destroy/recreate stabil)
+    await page.getByRole("tab", { name: "Mingguan", exact: true }).click();
     await page.getByRole("button", { name: /^Minggu Ini$/ }).click();
     await page.waitForTimeout(800);
     const boxMinggu = await page.$eval("#grafik-minggu", (el) => el.getBoundingClientRect().height);
