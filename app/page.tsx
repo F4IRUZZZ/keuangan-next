@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { NumberTicker } from "@/components/ui/number-ticker";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   formatRupiah,
   formatTanggal,
@@ -47,6 +48,7 @@ function judul(t: Transaksi, notes: Catatan[]): string {
 
 export default function Dashboard() {
   const [periode, setPeriode] = useState<Periode>("semua");
+  const [tabGrafik, setTabGrafik] = useState("arus");
   const [saldo, setSaldo] = useState<Saldo>({ masuk: 0, keluar: 0, saldo: 0 });
   const [kat, setKat] = useState<RingkasKat[]>([]);
   const [riwayat, setRiwayat] = useState<Transaksi[]>([]);
@@ -170,7 +172,7 @@ export default function Dashboard() {
       charts.current.forEach((c) => c.destroy());
       charts.current = [];
     };
-  }, [saldo, kat, minggu]);
+  }, [saldo, kat, minggu, tabGrafik]);
 
   return (
     <main className="mx-auto w-full max-w-6xl space-y-6 p-4 pb-16 md:p-8">
@@ -237,15 +239,32 @@ export default function Dashboard() {
       {saldo.masuk === 0 && saldo.keluar === 0 ? (
         <p className="text-sm text-muted-foreground">Silakan input data terlebih dahulu untuk menampilkan grafik.</p>
       ) : (
-        <>
-        <div className="grid gap-6 md:grid-cols-2">
-          <Card><CardContent className="pt-4"><canvas id="grafik-arus" ref={refArus} height={220} /></CardContent></Card>
-          <Card><CardContent className="pt-4"><canvas id="grafik-minggu" ref={refMinggu} height={220} aria-label="Grafik batang pemasukan dan pengeluaran per hari Senin sampai Minggu" /></CardContent></Card>
-        </div>
-        {kat.length > 0 && (
-          <Card className="mx-auto w-full max-w-[560px]"><CardContent className="pt-4"><canvas id="grafik-kategori" ref={refDonat} height={220} /></CardContent></Card>
-        )}
-        </>
+        <Card>
+          <CardContent className="pt-4">
+            <Tabs value={tabGrafik} onValueChange={setTabGrafik}>
+              <TabsList aria-label="Pilih grafik">
+                <TabsTrigger value="arus">Arus</TabsTrigger>
+                <TabsTrigger value="minggu">Mingguan</TabsTrigger>
+                <TabsTrigger value="kategori">Kategori</TabsTrigger>
+              </TabsList>
+              <TabsContent value="arus">
+                <canvas id="grafik-arus" ref={refArus} height={220} />
+              </TabsContent>
+              <TabsContent value="minggu">
+                <canvas id="grafik-minggu" ref={refMinggu} height={220} aria-label="Grafik batang pemasukan dan pengeluaran per hari Senin sampai Minggu" />
+              </TabsContent>
+              <TabsContent value="kategori">
+                {kat.length > 0 ? (
+                  <div className="mx-auto w-full max-w-[560px]">
+                    <canvas id="grafik-kategori" ref={refDonat} height={220} />
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">Belum ada pengeluaran pada periode ini.</p>
+                )}
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
       )}
       <Card>
         <CardHeader><CardTitle>Terakhir dicatat</CardTitle></CardHeader>
