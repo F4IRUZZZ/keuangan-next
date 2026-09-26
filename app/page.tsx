@@ -201,7 +201,7 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </div>
-      <Card className="bg-emerald-700 text-white dark:bg-emerald-900">
+      <Card className="bg-gradient-to-br from-emerald-600 to-emerald-800 text-white dark:from-emerald-800 dark:to-emerald-950">
         <CardContent className="pt-4">
           <p className="text-sm opacity-85">Saldo</p>
           <p className={`text-4xl font-bold tabular-nums${saldo.saldo < 0 ? " text-red-200" : ""}`}>
