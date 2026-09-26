@@ -20,7 +20,15 @@ const lapor = (n, ok, d) => {
     // Buat baris target (jenis keluar dulu agar #kat tampil)
     await page.locator("#tab-form").getByRole("tab", { name: /^Keluar/ }).click();
     await page.fill("#jml", "91000");
-    await page.fill("#kat", "TesCatatan");
+    await page.click("#kombo-kat");
+    await page.waitForSelector('[role="listbox"]', { timeout: 8000 });
+    await page.fill('input[aria-label="Cari kategori"]', "TesCatatan");
+    await page.getByRole("button", { name: '+ Tambah "TesCatatan"' }).click();
+    await page.waitForFunction(
+      (t) => document.getElementById("kombo-kat")?.textContent?.includes(t),
+      "TesCatatan",
+      { timeout: 8000 }
+    );
     await page.click('button[type="submit"]');
     await page.waitForFunction(() => /tercatat/.test(document.body.textContent ?? ""), null, { timeout: 10000 });
     // Buka dialog catatan baris TesCatatan
