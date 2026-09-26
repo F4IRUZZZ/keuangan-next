@@ -37,7 +37,7 @@
 - [x] F1.3b: tanggal cicilan bisa diatur + tombol Rincian + tanggal dd/mm/yyyy + label Cicil (PR #14 merged)
 - [x] F1.4: produk CRUD + hitung pakai + dropdown kategori custom (PR #16 merged)
 - [x] F1.5: dashboard riwayat ringkas + grafik mingguan (PR #18 merged)
-- [ ] F1.6: menu Riwayat terpisah (tab Transaksi | Hutang, baca-saja; dashboard tetap 5 + link) — dieksekusi setelah F1.5
+- [x] F1.6: menu Riwayat terpisah (tab Transaksi | Hutang, baca-saja; dashboard tetap 5 + link) (PR #28 merged)
 
 - Kriteria: semua skenario vanilla lolos di `:3000`.
 
@@ -84,6 +84,7 @@ _Belum ada usulan._
 
 | Tanggal | Perubahan | Uji | PR |
 |---|---|---|---|
+| 2026-09-27 | F1.6 merged: menu Riwayat (tab Transaksi\|Hutang baca-saja) + nav 6 item | F16 6/6, F15 ALL-OK, tsc, build | #28 |
 | 2026-09-27 | F1.5c merged: kunci tinggi chart h-64 (dari ~540px) | screenshot 1056x256, F15 ALL-OK, tsc | #26 |
 | 2026-09-27 | F1.5b merged: 3 grafik jadi 1 frame 3 tab (Arus\|Mingguan\|Kategori) | F15 9/9, screenshot 3 tab, tsc | #24 |
 | 2026-09-27 | Fix tooltip RpNaN: parsed.y (semantik vanilla) | screenshot hover Rp45.000, F15 ALL-OK, tsc | #22 |
