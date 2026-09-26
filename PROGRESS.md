@@ -84,6 +84,7 @@ _Belum ada usulan._
 
 | Tanggal | Perubahan | Uji | PR |
 |---|---|---|---|
+| 2026-09-27 | F1.5b merged: 3 grafik jadi 1 frame 3 tab (Arus\|Mingguan\|Kategori) | F15 9/9, screenshot 3 tab, tsc | #24 |
 | 2026-09-27 | Fix tooltip RpNaN: parsed.y (semantik vanilla) | screenshot hover Rp45.000, F15 ALL-OK, tsc | #22 |
 | 2026-09-27 | Fix donat kebesaran: batasi 560px tengah (paritas vanilla) | screenshot 528px, F15 ALL-OK, tsc | #20 |
 | 2026-09-27 | F1.5 merged: grafik mingguan + aksi cepat + label periode + riwayat catatan + saldo-minus | F15 9/9, F11/B22/F13/F14 ALL-OK, tsc, build | #18 |
