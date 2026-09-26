@@ -12,7 +12,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { ToggleTema } from "@/components/toggle-tema";
+import { PemilihTema } from "@/components/pemilih-tema";
 import {
   formatRupiah,
   getBatasHarian,
@@ -122,8 +122,8 @@ export default function PengaturanPage() {
       <Card>
         <CardHeader><CardTitle>Tampilan</CardTitle></CardHeader>
         <CardContent className="flex flex-wrap items-center gap-3">
-          <ToggleTema />
-          <p className="text-sm text-muted-foreground">Pilihan tersimpan di perangkat ini.</p>
+          <PemilihTema />
+          <p className="text-sm text-muted-foreground">Sistem = ikut terang/gelap HP &amp; laptop ini.</p>
         </CardContent>
       </Card>
       <Card>

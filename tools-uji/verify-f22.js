@@ -47,31 +47,46 @@ function kemarinISO() {
     lapor("angka id-ID bertitik", true);
     const gelapAwal = await page.evaluate(() => document.documentElement.classList.contains("dark"));
     if (gelapAwal) throw new Error("harusnya terang dulu");
-    // Toggle sidebar -> gelap: class + persist + label flip
-    // Via keyboard: badge overlay dev (kiri bawah, dev-only) menutupi tombol
-    // untuk klik mouse; Enter juga membuktikan aksesibilitas keyboard.
-    await page.getByRole("button", { name: "Ganti ke tema gelap" }).focus();
-    await page.keyboard.press("Enter");
+    // Sidebar nihil kontrol tema (satu-satunya di Pengaturan)
+    const kontrolNav = await page.locator("nav").getByRole("tab").count();
+    if (kontrolNav > 0) throw new Error("sidebar masih ada kontrol tema");
+    lapor("sidebar nihil kontrol tema", true);
+    // Pengaturan: default segmen Sistem + ikut OS (terang)
+    await page.goto(`${BASE}/pengaturan`, { waitUntil: "load", timeout: 120000 });
+    const segAwal = await page.getByRole("tab", { selected: true }).textContent();
+    if ((segAwal ?? "").trim() !== "Sistem") throw new Error("default bukan Sistem: " + segAwal);
+    const simpanAwal = await page.evaluate(() => localStorage.getItem("famvault-tema"));
+    if (simpanAwal !== null && simpanAwal !== "sistem") throw new Error("persist awal=" + simpanAwal);
+    lapor("default Sistem ikut OS", true);
+    // Segmen Gelap -> class + persist
+    await page.getByRole("tab", { name: "Gelap", exact: true }).click();
     await page.waitForFunction(() => document.documentElement.classList.contains("dark"), null, { timeout: 8000 });
     const simpan = await page.evaluate(() => localStorage.getItem("famvault-tema"));
     if (simpan !== "gelap") throw new Error("persist=" + simpan);
-    await page.getByRole("button", { name: "Ganti ke tema terang" }).waitFor({ timeout: 8000 });
-    lapor("toggle ke gelap + persist", true);
+    lapor("segmen Gelap + persist", true);
     // Grafik tetap ter-render sesudah ganti tema (recreate)
+    await page.goto(`${BASE}/`, { waitUntil: "load", timeout: 120000 });
+    await page.waitForFunction(() => document.documentElement.classList.contains("dark"), null, { timeout: 8000 });
     await page.getByRole("tab", { name: "Mingguan", exact: true }).click();
     await page.waitForTimeout(800);
     const boxG = await page.$eval("#grafik-minggu", (el) => el.getBoundingClientRect().height);
     if (boxG < 50) throw new Error("grafik hilang sesudah toggle");
     lapor("grafik ikut tema", true);
-    // Reload -> tetap gelap; toggle Pengaturan -> terang (sinkron 2 instance)
+    // Reload -> tetap gelap; segmen Terang -> terang + persist
     await page.reload({ waitUntil: "load", timeout: 120000 });
     await page.waitForFunction(() => document.documentElement.classList.contains("dark"), null, { timeout: 8000 });
     await page.goto(`${BASE}/pengaturan`, { waitUntil: "load", timeout: 120000 });
-    await page.locator("main").getByRole("button", { name: "Ganti ke tema terang" }).click();
+    await page.getByRole("tab", { name: "Terang", exact: true }).click();
     await page.waitForFunction(() => !document.documentElement.classList.contains("dark"), null, { timeout: 8000 });
-    // Instance sidebar ikut sinkron via event
-    await page.locator("nav").getByRole("button", { name: "Ganti ke tema gelap" }).waitFor({ timeout: 8000 });
-    lapor("persist reload + toggle Pengaturan + sinkron", true);
+    const simpanT = await page.evaluate(() => localStorage.getItem("famvault-tema"));
+    if (simpanT !== "terang") throw new Error("persist terang=" + simpanT);
+    lapor("persist reload + segmen Terang", true);
+    // Segmen Sistem -> ikut OS (terang di headless) + persist "sistem"
+    await page.getByRole("tab", { name: "Sistem", exact: true }).click();
+    await page.waitForFunction(() => !document.documentElement.classList.contains("dark"), null, { timeout: 8000 });
+    const simpanS = await page.evaluate(() => localStorage.getItem("famvault-tema"));
+    if (simpanS !== "sistem") throw new Error("persist sistem=" + simpanS);
+    lapor("segmen Sistem ikut OS", true);
     // Font Geist terpakai
     const font = await page.evaluate(() => getComputedStyle(document.body).fontFamily);
     if (!/Geist/i.test(font)) throw new Error("font=" + font);
