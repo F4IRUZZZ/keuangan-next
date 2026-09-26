@@ -289,7 +289,7 @@ function IsiTransaksi() {
           <CardContent className="pt-4">
             <p className="text-xs text-muted-foreground">Masuk (Bln Ini)</p>
             <p className="text-2xl font-bold text-emerald-600 tabular-nums dark:text-emerald-400">
-              Rp<NumberTicker value={saldoBulan.masuk} className="text-emerald-600 dark:text-emerald-400" />
+              Rp<NumberTicker value={saldoBulan.masuk} />
             </p>
           </CardContent>
         </Card>
@@ -297,7 +297,7 @@ function IsiTransaksi() {
           <CardContent className="pt-4">
             <p className="text-xs text-muted-foreground">Keluar (Bln Ini)</p>
             <p className="text-2xl font-bold text-red-600 tabular-nums dark:text-red-400">
-              Rp<NumberTicker value={saldoBulan.keluar} className="text-red-600 dark:text-red-400" />
+              Rp<NumberTicker value={saldoBulan.keluar} />
             </p>
           </CardContent>
         </Card>

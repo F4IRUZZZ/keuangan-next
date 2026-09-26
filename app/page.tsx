@@ -188,7 +188,7 @@ export default function Dashboard() {
           <CardContent className="pt-4">
             <p className="text-xs text-muted-foreground">Total masuk</p>
             <p className="text-2xl font-bold text-emerald-600 tabular-nums dark:text-emerald-400">
-              Rp<NumberTicker value={saldo.masuk} className="text-emerald-600 dark:text-emerald-400" />
+              Rp<NumberTicker value={saldo.masuk} />
             </p>
           </CardContent>
         </Card>
@@ -196,7 +196,7 @@ export default function Dashboard() {
           <CardContent className="pt-4">
             <p className="text-xs text-muted-foreground">Total keluar</p>
             <p className="text-2xl font-bold text-red-600 tabular-nums dark:text-red-400">
-              Rp<NumberTicker value={saldo.keluar} className="text-red-600 dark:text-red-400" />
+              Rp<NumberTicker value={saldo.keluar} />
             </p>
           </CardContent>
         </Card>
@@ -205,7 +205,7 @@ export default function Dashboard() {
         <CardContent className="p-5">
           <p className="mb-1 text-[0.85rem] font-semibold opacity-85">Saldo</p>
           <p className={`text-4xl font-bold tabular-nums${saldo.saldo < 0 ? " text-red-200 dark:text-red-200" : ""}`}>
-            Rp<NumberTicker value={saldo.saldo} className={saldo.saldo < 0 ? "text-red-200 dark:text-red-200" : "text-white"} />
+            Rp<NumberTicker value={saldo.saldo} />
           </p>
           <p className="mt-1.5 text-xs opacity-85">{LABEL_PERIODE[periode]}</p>
         </CardContent>
