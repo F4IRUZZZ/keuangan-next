@@ -109,7 +109,12 @@ export default function Dashboard() {
     if (typeof window === "undefined") return;
     const gelap = document.documentElement.classList.contains("dark");
     const ticks = gelap ? "#93a89e" : "#6b7280";
-    const labelRp = (c: { parsed: unknown }) => ` Rp${formatRupiah(Number(c.parsed))}`;
+    // Tooltip Rp (semantik = vanilla): bar parsed={x,y}, donat parsed=angka.
+    const labelRp = (c: { parsed: { y?: unknown } | number | null }) => {
+      const p = c.parsed;
+      const angka = typeof p === "number" ? p : Number(p?.y ?? 0);
+      return ` Rp${formatRupiah(angka)}`;
+    };
     if (refArus.current)
       charts.current.push(
         new Chart(refArus.current, {
