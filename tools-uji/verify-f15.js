@@ -37,10 +37,10 @@ function isoSeninPlus(offset) {
       if (h !== href) throw new Error(`aksi ${nama} href=${h}`);
     }
     lapor("aksi cepat 3 link", true);
-    // Label periode: default + ganti filter
+    // Label periode: default Minggu Ini + ganti filter
     const labelAda = async (t) =>
       page.waitForFunction((x) => (document.body.textContent ?? "").includes(x), t, { timeout: 8000 });
-    await labelAda("Semua Waktu");
+    await labelAda("Minggu Ini");
     await page.getByRole("button", { name: /^Minggu Ini$/ }).click();
     await labelAda("Minggu Ini");
     await page.getByRole("button", { name: /^Bulan Ini$/ }).click();

@@ -47,7 +47,7 @@ function judul(t: Transaksi, notes: Catatan[]): string {
 }
 
 export default function Dashboard() {
-  const [periode, setPeriode] = useState<Periode>("semua");
+  const [periode, setPeriode] = useState<Periode>("minggu");
   const [tabGrafik, setTabGrafik] = useState("arus");
   const [saldo, setSaldo] = useState<Saldo>({ masuk: 0, keluar: 0, saldo: 0 });
   const [kat, setKat] = useState<RingkasKat[]>([]);
@@ -226,7 +226,7 @@ export default function Dashboard() {
         <Link className={buttonVariants({ variant: "outline" })} href="/hutang">Bayar Hutang</Link>
       </div>
       <div className="flex gap-2">
-        {(["semua", "minggu", "bulan"] as Periode[]).map((p) => (
+        {(["minggu", "bulan", "semua"] as Periode[]).map((p) => (
           <Button key={p} variant={periode === p ? "default" : "secondary"} onClick={() => setPeriode(p)}>
             {p === "semua" ? "Semua Waktu" : p === "minggu" ? "Minggu Ini" : "Bulan Ini"}
           </Button>
