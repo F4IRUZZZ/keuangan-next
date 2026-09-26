@@ -46,7 +46,7 @@
 - [x] F2.0 (pertama): sidebar kiri + logo FamVault pojok kiri atas (desktop; HP tetap bottom-nav tanpa logo) + logo di manifest/favicon (PR #31 merged)
 - [x] F2.1: dock final (hapus demo) + hero ala vanilla + polish gelap + audit spacing + angka ticker warisi warna (PR #33 merged)
 - [x] F2.2: palet warning/info + segmen tema Sistem|Terang|Gelap + koma-titik id-ID (breadcrumb SKIP, Geist verifikasi) (PR #35 merged)
-- [ ] Uji paritas visual vs referensi (screenshot 2 tema)
+- [x] F2.3: paritas visual vs vanilla + mini-bar kategori + judul emerald (T3/T4 backlog) (PR #37 merged)
 
 - Kriteria: nilai berdampingan vs referensi DompetKu.
 
@@ -86,6 +86,7 @@ _Belum ada usulan._
 
 | Tanggal | Perubahan | Uji | PR |
 |---|---|---|---|
+| 2026-09-27 | F2.3 merged: 16 shot paritas + mini-bar + judul emerald | F15/F16/F20/F22 ALL-OK, tsc, build | #37 |
 | 2026-09-27 | F2.2 merged: warning/info + segmen tema + id-ID + badge amber | F22 10/10, F15/F16/F20 ALL-OK, tsc, build | #35 |
 | 2026-09-27 | F2.1 merged: hapus Dock/demo + radius 16px + token gelap emerald + hero vanilla + ticker warisi warna | matriks 12 shot 2 tema, F15/F16/F20 ALL-OK, tsc, build | #33 |
 | 2026-09-27 | F2.0 merged: sidebar w-60 + logo FamVault + manifest + favicon | F20 4/4, F15/F16 ALL-OK, tsc, build | #31 |
