@@ -10,7 +10,9 @@ import {
   LayoutDashboard,
   Package,
   Settings,
+  Tag,
 } from "lucide-react";
+import { APP_VERSION } from "@/lib/app-info";
 
 const NAV = [
   { href: "/", label: "Dashboard", ikon: LayoutDashboard },
@@ -55,6 +57,9 @@ export function Nav() {
             );
           })}
         </div>
+        <p className="mt-auto flex items-center gap-1.5 px-4 py-3 text-xs text-muted-foreground">
+          <Tag className="size-3.5" aria-hidden="true" />v{APP_VERSION}
+        </p>
       </nav>
       {/* HP + tablet: bottom-nav ala vanilla (ikon + label + titik aktif) */}
       <nav aria-label="Navigasi utama" className="fixed inset-x-0 bottom-0 z-40 border-t bg-background/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden">
