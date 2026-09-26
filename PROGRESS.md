@@ -88,6 +88,7 @@ _Belum ada usulan._
 
 | Tanggal | Perubahan | Uji | PR |
 |---|---|---|---|
+| 2026-09-27 | Indikator koneksi dinamis merged (badge offline saat offline) | F31 +2 assert, F15/F16 ALL-OK, tsc, build | #53 |
 | 2026-09-27 | Audit predeploy merged: B21 hidup + wipe tema + storage error eksplisit | B21/F13/F11/B22/F32 ALL-OK, tsc, build | #49 |
 | 2026-09-27 | Kas auto cicil/lunas berkategori Hutang/Piutang (divergen vanilla) | F13 +2 assert, B22/F15/F16 ALL-OK | #47 |
 | 2026-09-27 | F3.2 prep merged: apple-icon + theme-color + logo kecil | F31/F20 ALL-OK, tsc, build | #51 |
