@@ -198,7 +198,7 @@ export default function HutangPage() {
                 <Input
                   id="jml-hutang"
                   inputMode="numeric"
-                  className="text-3xl font-bold"
+                  className="text-3xl font-bold placeholder:text-base placeholder:font-normal"
                   placeholder="contoh: 50000"
                   value={jumlah}
                   onChange={(e) => ketikRp(e.target.value, setJumlah)}

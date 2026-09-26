@@ -323,7 +323,7 @@ function IsiTransaksi() {
                   <Input
                     id="jml"
                     inputMode="numeric"
-                    className="text-3xl font-bold"
+                    className="text-3xl font-bold placeholder:text-base placeholder:font-normal"
                     placeholder="contoh: 20000"
                     value={nominal}
                     onChange={(e) => ketikNominal(e.target.value)}

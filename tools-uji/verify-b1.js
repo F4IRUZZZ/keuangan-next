@@ -43,8 +43,10 @@ const lapor = (n, ok, d) => {
       { timeout: 15000 }
     );
     lapor("restore backup vanilla", true);
-    // Banding angka
+    // Banding angka (backup bertanggal lama -> pilih Semua Waktu dulu,
+    // karena default dashboard = Minggu Ini)
     await page.goto(`${BASE}/`, { waitUntil: "load", timeout: 60000 });
+    await page.getByRole("button", { name: /^Semua Waktu$/ }).click();
     await page.waitForFunction(() => /Rp300\.000/.test(document.body.textContent ?? ""), null, { timeout: 15000 });
     lapor("saldo Rp300.000 cocok", true);
     await page.goto(`${BASE}/produk`, { waitUntil: "load", timeout: 60000 });
