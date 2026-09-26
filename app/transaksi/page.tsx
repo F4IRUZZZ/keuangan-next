@@ -4,6 +4,7 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
+import { BadgeKoneksi } from "@/components/badge-koneksi";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -290,7 +291,7 @@ function IsiTransaksi() {
     <main className="mx-auto w-full max-w-6xl space-y-6 p-4 pb-16 md:p-8">
       <div className="flex flex-wrap items-center gap-3">
         <h1 className="text-3xl font-bold text-emerald-700 dark:text-emerald-300">Catat &amp; Kelola Transaksi</h1>
-        <Badge variant="secondary">Offline - Perangkat ini</Badge>
+        <BadgeKoneksi />
       </div>
       <div className="grid grid-cols-2 gap-3">
         <Card>

@@ -74,11 +74,16 @@ function serveOut() {
     await page.click('button[type="submit"]');
     await page.waitForFunction(() => /tercatat/.test(document.body.textContent ?? ""), null, { timeout: 10000 });
     lapor("seed online", true);
+    // Online: badge koneksi tidak tampil
+    const badgeOn = await page.getByText("Offline • Perangkat ini", { exact: true }).count();
+    if (badgeOn > 0) throw new Error("badge tampil saat online");
+    lapor("badge absen saat online", true);
     // MODE PESAWAT: reload dashboard + transaksi + hutang dari cache + IDB
     await page.context().setOffline(true);
     await page.goto(`${BASE}/`, { waitUntil: "load", timeout: 30000 });
     await page.waitForFunction(() => /Keluar - TesOff/.test(document.body.textContent ?? ""), null, { timeout: 15000 });
-    lapor("dashboard offline tampil", true);
+    await page.waitForFunction(() => /Offline • Perangkat ini/.test(document.body.textContent ?? ""), null, { timeout: 15000 });
+    lapor("dashboard offline tampil + badge", true);
     await page.goto(`${BASE}/transaksi`, { waitUntil: "load", timeout: 30000 });
     await page.waitForFunction(() => /TesOff/.test(document.body.textContent ?? ""), null, { timeout: 15000 });
     lapor("transaksi offline tampil", true);

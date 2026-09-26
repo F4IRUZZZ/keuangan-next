@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import { BadgeKoneksi } from "@/components/badge-koneksi";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -122,7 +123,7 @@ export default function PengaturanPage() {
     <main className="mx-auto w-full max-w-6xl space-y-6 p-4 pb-16 md:p-8">
       <div className="flex flex-wrap items-center gap-3">
         <h1 className="text-3xl font-bold text-emerald-700 dark:text-emerald-300">Pengaturan</h1>
-        <Badge variant="secondary">Offline • Perangkat ini</Badge>
+        <BadgeKoneksi />
       </div>
       <Card>
         <CardHeader><CardTitle>Tampilan</CardTitle></CardHeader>

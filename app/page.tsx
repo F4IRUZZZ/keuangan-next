@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Chart } from "chart.js/auto";
 import { Badge } from "@/components/ui/badge";
+import { BadgeKoneksi } from "@/components/badge-koneksi";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { NumberTicker } from "@/components/ui/number-ticker";
@@ -191,7 +192,7 @@ export default function Dashboard() {
     <main className="mx-auto w-full max-w-6xl space-y-6 p-4 pb-16 md:p-8">
       <div className="flex flex-wrap items-center gap-3">
         <h1 className="text-3xl font-bold text-emerald-700 dark:text-emerald-300">Dashboard</h1>
-        <Badge variant="secondary">Offline • Perangkat ini</Badge>
+        <BadgeKoneksi />
       </div>
       <div className="grid grid-cols-2 gap-3">
         <Card className="transition-transform hover:-translate-y-0.5">
