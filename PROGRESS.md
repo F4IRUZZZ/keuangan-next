@@ -87,6 +87,7 @@ _Belum ada usulan._
 
 | Tanggal | Perubahan | Uji | PR |
 |---|---|---|---|
+| 2026-09-27 | F1.5d merged: default Minggu Ini + placeholder kecil | F15/F22/B1 ALL-OK, tsc, build | #43 |
 | 2026-09-27 | Fix overflow HP: grid blowout form transaksi | pra doc=523 -> pasca 415, audit 18 kombinasi NOL-LUBER, B22/F13 ALL-OK | #41 |
 | 2026-09-27 | F2.4 merged: tombol ikon + logo transparan | 8 suite ALL-OK, tsc, build | #39 |
 | 2026-09-27 | F2.3 merged: 16 shot paritas + mini-bar + judul emerald | F15/F16/F20/F22 ALL-OK, tsc, build | #37 |
