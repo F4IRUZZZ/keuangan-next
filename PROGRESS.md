@@ -66,6 +66,8 @@
 
 - [ ] Vanilla: DompetKu-3/4, push 39 commit, HP fisik, onboarding
 - [ ] Next: Dialog konfirmasi cantik (sementara confirm())
+- [ ] Next (temuan paritas F2.3): command palette Cari/aksi Ctrl+K ala vanilla (fase sendiri)
+- [ ] Next (temuan paritas F2.3): set ikon kategori + tombol-ikon baris transaksi ala vanilla (fase sendiri)
 
 ## D. Arsip vanilla (beku, hanya dibaca)
 

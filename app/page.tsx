@@ -190,7 +190,7 @@ export default function Dashboard() {
   return (
     <main className="mx-auto w-full max-w-6xl space-y-6 p-4 pb-16 md:p-8">
       <div className="flex flex-wrap items-center gap-3">
-        <h1 className="text-3xl font-bold">Dashboard</h1>
+        <h1 className="text-3xl font-bold text-emerald-700 dark:text-emerald-300">Dashboard</h1>
         <Badge variant="secondary">Offline • Perangkat ini</Badge>
       </div>
       <div className="grid grid-cols-2 gap-3">
@@ -240,9 +240,12 @@ export default function Dashboard() {
           ) : (
             <ul className="space-y-2">
               {kat.map((r) => (
-                <li key={r.kategori} className="flex justify-between text-sm">
-                  <span>{r.kategori}</span>
-                  <span className="tabular-nums">Rp{formatRupiah(r.total)} ({r.persen}%)</span>
+                <li key={r.kategori} className="flex items-center gap-3 text-sm">
+                  <span className="w-24 shrink-0 truncate">{r.kategori}</span>
+                  <span className="h-2 min-w-0 flex-1 overflow-hidden rounded-full bg-muted" aria-hidden="true">
+                    <span className="block h-full rounded-full bg-emerald-600" style={{ width: `${r.persen}%` }} />
+                  </span>
+                  <span className="shrink-0 tabular-nums">Rp{formatRupiah(r.total)} ({r.persen}%)</span>
                 </li>
               ))}
             </ul>

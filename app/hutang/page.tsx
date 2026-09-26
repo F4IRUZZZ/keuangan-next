@@ -171,7 +171,7 @@ export default function HutangPage() {
   return (
     <main className="mx-auto w-full max-w-6xl space-y-6 p-4 pb-16 md:p-8">
       <div className="flex flex-wrap items-center gap-3">
-        <h1 className="text-3xl font-bold">Hutang</h1>
+        <h1 className="text-3xl font-bold text-emerald-700 dark:text-emerald-300">Hutang</h1>
         <Badge variant="secondary">Offline - Perangkat ini</Badge>
       </div>
 
