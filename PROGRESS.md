@@ -44,7 +44,7 @@
 ## F2 — Desain & layout belakangan
 
 - [x] F2.0 (pertama): sidebar kiri + logo FamVault pojok kiri atas (desktop; HP tetap bottom-nav tanpa logo) + logo di manifest/favicon (PR #31 merged)
-- [ ] Dock final + hero + tema terang/gelap polish + audit spacing/typography
+- [x] F2.1: dock final (hapus demo) + hero ala vanilla + polish gelap + audit spacing + angka ticker warisi warna (PR #33 merged)
 - [ ] Palet, breadcrumb, dark toggle, koma-titik id-ID, font Geist (= B4 lama, pindah ke sini)
 - [ ] Uji paritas visual vs referensi (screenshot 2 tema)
 
@@ -84,6 +84,7 @@ _Belum ada usulan._
 
 | Tanggal | Perubahan | Uji | PR |
 |---|---|---|---|
+| 2026-09-27 | F2.1 merged: hapus Dock/demo + radius 16px + token gelap emerald + hero vanilla + ticker warisi warna | matriks 12 shot 2 tema, F15/F16/F20 ALL-OK, tsc, build | #33 |
 | 2026-09-27 | F2.0 merged: sidebar w-60 + logo FamVault + manifest + favicon | F20 4/4, F15/F16 ALL-OK, tsc, build | #31 |
 | 2026-09-27 | Fix nav: Riwayat pindah ke kiri Pengaturan | F16 ALL-OK, tsc | #29 |
 | 2026-09-27 | F1.6 merged: menu Riwayat (tab Transaksi\|Hutang baca-saja) + nav 6 item | F16 6/6, F15 ALL-OK, tsc, build | #28 |
