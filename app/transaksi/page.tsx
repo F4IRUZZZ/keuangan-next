@@ -305,7 +305,7 @@ function IsiTransaksi() {
       </div>
 
       <div className="grid items-start gap-6 lg:grid-cols-[420px_minmax(0,1fr)]">
-        <div className="space-y-4">
+        <div className="min-w-0 space-y-4">
           <Card>
             <CardHeader>
               <CardTitle>Catat Transaksi</CardTitle>
@@ -365,14 +365,14 @@ function IsiTransaksi() {
                 )}
                 <div>
                   <label className="mb-1 block text-sm font-medium" htmlFor="tgl">Tanggal</label>
-                  <Input id="tgl" type="date" value={tanggal} onChange={(e) => setTanggal(e.target.value)} />
+                  <Input id="tgl" type="date" value={tanggal} onChange={(e) => setTanggal(e.target.value)} className="max-w-full" />
                 </div>
                 <div>
                   <label className="mb-1 block text-sm font-medium" htmlFor="ctt">Catatan (opsional)</label>
                   <Input id="ctt" placeholder="contoh: Gajian minggu ini" value={catatan} onChange={(e) => setCatatan(e.target.value)} />
                 </div>
-                <div className="flex gap-2">
-                  <Button type="submit" className="flex-1" size="lg" disabled={menyimpan}>
+                <div className="flex flex-wrap gap-2">
+                  <Button type="submit" className="min-w-0 flex-1" size="lg" disabled={menyimpan}>
                     {menyimpan ? "Menyimpan..." : "Simpan Transaksi"}
                   </Button>
                   <Button type="button" variant="secondary" size="lg" onClick={resetForm}>
@@ -412,7 +412,7 @@ function IsiTransaksi() {
           )}
         </div>
 
-        <section className="space-y-4">
+        <section className="min-w-0 space-y-4">
           <Tabs value={tab} onValueChange={setTab}>
             <TabsList id="tab-daftar">
               <TabsTrigger value="semua">Semua ({dataPraTab.length})</TabsTrigger>
