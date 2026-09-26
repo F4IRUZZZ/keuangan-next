@@ -55,8 +55,8 @@
 
 - [x] F3.1: output export + SW manual famvault-v1 + uji pesawat desktop (PR #45 merged)
 - [x] F3.2 prep: apple-icon + theme-color + logo kecil (PR #51 merged)
-- [ ] Deploy Vercel Hobby (HTTPS) + install PWA + mode pesawat HP (JALAN: panduan di tangan user)
-- [ ] Migrasi backup JSON + matikan SnapDeploy/TiDB (bila yakin)
+- [x] F3.2: Deploy Vercel Hobby + install PWA + mode pesawat HP (URL famvault-next.vercel.app, checklist HP 5/5)
+- [x] F3.3: layanan lama kosong terbukti (SnapDeploy 0 kontainer + TiDB kosong), tanpa migrasi data
 
 ## F4 — OAuth Google + data bersama (NANTI, desain dulu)
 
@@ -88,6 +88,8 @@ _Belum ada usulan._
 
 | Tanggal | Perubahan | Uji | PR |
 |---|---|---|---|
+| 2026-09-27 | F3.2 closed: deploy live + PWA install + pesawat HP 5/5 | famvault-next.vercel.app | - |
+| 2026-09-27 | F3.3 closed: SnapDeploy/TiDB kosong, tanpa migrasi | bukti screenshot dashboard | - |
 | 2026-09-27 | Indikator koneksi dinamis merged (badge offline saat offline) | F31 +2 assert, F15/F16 ALL-OK, tsc, build | #53 |
 | 2026-09-27 | Audit predeploy merged: B21 hidup + wipe tema + storage error eksplisit | B21/F13/F11/B22/F32 ALL-OK, tsc, build | #49 |
 | 2026-09-27 | Kas auto cicil/lunas berkategori Hutang/Piutang (divergen vanilla) | F13 +2 assert, B22/F15/F16 ALL-OK | #47 |
