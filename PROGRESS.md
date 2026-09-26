@@ -84,6 +84,7 @@ _Belum ada usulan._
 
 | Tanggal | Perubahan | Uji | PR |
 |---|---|---|---|
+| 2026-09-27 | Fix nav: Riwayat pindah ke kiri Pengaturan | F16 ALL-OK, tsc | #29 |
 | 2026-09-27 | F1.6 merged: menu Riwayat (tab Transaksi\|Hutang baca-saja) + nav 6 item | F16 6/6, F15 ALL-OK, tsc, build | #28 |
 | 2026-09-27 | F1.5c merged: kunci tinggi chart h-64 (dari ~540px) | screenshot 1056x256, F15 ALL-OK, tsc | #26 |
 | 2026-09-27 | F1.5b merged: 3 grafik jadi 1 frame 3 tab (Arus\|Mingguan\|Kategori) | F15 9/9, screenshot 3 tab, tsc | #24 |
