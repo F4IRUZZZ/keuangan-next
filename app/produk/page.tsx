@@ -64,6 +64,9 @@ export default function ProdukPage() {
       setNama("");
       setKategori("");
       await muat();
+    } catch {
+      setPesan("Gagal simpan: penyimpanan perangkat penuh.");
+      setPesanOk(false);
     } finally {
       setMenyimpan(false);
     }
@@ -78,19 +81,23 @@ export default function ProdukPage() {
 
   async function simpanUbah() {
     if (ubahId === null) return;
-    const out = await updateProduk(ubahId, { nama: ubahNama, kategori: ubahKat });
-    if (!out) {
-      setUbahPesan("Gagal: produk tidak ditemukan.");
-      return;
+    try {
+      const out = await updateProduk(ubahId, { nama: ubahNama, kategori: ubahKat });
+      if (!out) {
+        setUbahPesan("Gagal: produk tidak ditemukan.");
+        return;
+      }
+      if (typeof out === "object" && "error" in out) {
+        setUbahPesan(`Gagal (${out.code}): ${out.error}`);
+        return;
+      }
+      setUbahId(null);
+      setPesan(`Produk diubah jadi "${ubahNama}".`);
+      setPesanOk(true);
+      await muat();
+    } catch {
+      setUbahPesan("Gagal simpan: penyimpanan perangkat penuh.");
     }
-    if (typeof out === "object" && "error" in out) {
-      setUbahPesan(`Gagal (${out.code}): ${out.error}`);
-      return;
-    }
-    setUbahId(null);
-    setPesan(`Produk diubah jadi "${ubahNama}".`);
-    setPesanOk(true);
-    await muat();
   }
 
   async function jalankanHapus() {

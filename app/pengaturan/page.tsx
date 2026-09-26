@@ -108,7 +108,12 @@ export default function PengaturanPage() {
   }
 
   async function hapus() {
-    await hapusSemuaData();
+    try {
+      await hapusSemuaData();
+    } catch {
+      setHasil("Gagal hapus: penyimpanan perangkat bermasalah.");
+      return;
+    }
     setKonfirmHapus(false);
     setHasil("Semua data dihapus.");
   }

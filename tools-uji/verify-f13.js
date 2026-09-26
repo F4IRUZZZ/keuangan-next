@@ -150,6 +150,8 @@ const lapor = (n, ok, d) => {
     await page.waitForFunction(() => /Semua data dihapus/.test(document.body.textContent ?? ""), null, { polling: 100, timeout: 30000 });
     const sisaBatas = await page.evaluate(() => window.localStorage.getItem("batasHarian"));
     if (sisaBatas !== null) throw new Error("batasHarian masih ada: " + sisaBatas);
+    const sisaTema = await page.evaluate(() => window.localStorage.getItem("famvault-tema"));
+    if (sisaTema !== null) throw new Error("famvault-tema masih ada: " + sisaTema);
     lapor("zona bahaya hapus batas juga", true);
     const serius = errs.filter((m) => !/favicon/i.test(m));
     lapor("console bersih", serius.length === 0, serius.slice(0, 2).join(" | "));

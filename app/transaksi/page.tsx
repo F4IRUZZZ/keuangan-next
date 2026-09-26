@@ -166,6 +166,9 @@ function IsiTransaksi() {
       setCatatan("");
       setTanggal(tanggalHariIni());
       await muat();
+    } catch {
+      setPesan("Gagal simpan: penyimpanan perangkat penuh.");
+      setPesanOk(false);
     } finally {
       setMenyimpan(false);
     }
@@ -208,19 +211,23 @@ function IsiTransaksi() {
       tanggal: ubahTgl,
     };
     if (alvo?.jenis === "keluar") patch.kategori = ubahKat;
-    const out = await updateTransaksi(ubahId, patch);
-    if (!out) {
-      setUbahPesan("Gagal: transaksi tidak ditemukan.");
-      return;
+    try {
+      const out = await updateTransaksi(ubahId, patch);
+      if (!out) {
+        setUbahPesan("Gagal: transaksi tidak ditemukan.");
+        return;
+      }
+      if (typeof out === "object" && "error" in out) {
+        setUbahPesan(`Gagal (${out.code}): ${out.error}`);
+        return;
+      }
+      setUbahId(null);
+      setPesan(`Transaksi diubah jadi Rp${formatRupiah(jumlah)}.`);
+      setPesanOk(true);
+      await muat();
+    } catch {
+      setUbahPesan("Gagal simpan: penyimpanan perangkat penuh.");
     }
-    if (typeof out === "object" && "error" in out) {
-      setUbahPesan(`Gagal (${out.code}): ${out.error}`);
-      return;
-    }
-    setUbahId(null);
-    setPesan(`Transaksi diubah jadi Rp${formatRupiah(jumlah)}.`);
-    setPesanOk(true);
-    await muat();
   }
 
   async function jalankanHapus() {

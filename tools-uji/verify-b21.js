@@ -11,7 +11,11 @@ const lapor = (n, ok, d) => {
 };
 
 (async () => {
-  const srv = spawn("npm", ["run", "dev", "--", "--port", String(PORT)], { cwd: __dirname + "\\..", shell: true });
+  // Server persisten bila SKIP_SPAWN=1 (pola baku suite lain).
+  let srv = null;
+  if (process.env.SKIP_SPAWN !== "1") {
+    srv = spawn("npm", ["run", "dev", "--", "--port", String(PORT)], { cwd: __dirname + "\\..", shell: true });
+  }
   const t0 = Date.now();
   for (;;) {
     try {
@@ -35,10 +39,18 @@ const lapor = (n, ok, d) => {
       { timeout: 10000 }
     );
     lapor("validasi nominal 0", true);
-    // Tulis keluar 15000 + catatan (set jenis di FORM dulu agar #kat tampil)
+    // Tulis keluar 15000 + catatan (set jenis di FORM dulu agar dropdown tampil)
     await page.locator("#tab-form").getByRole("tab", { name: /^Keluar/ }).click();
     await page.fill("#jml", "15000");
-    await page.fill("#kat", "TesB2");
+    await page.click("#kombo-kat");
+    await page.waitForSelector('[role="listbox"]', { timeout: 8000 });
+    await page.fill('input[aria-label="Cari kategori"]', "TesB2");
+    await page.getByRole("button", { name: '+ Tambah "TesB2"' }).click();
+    await page.waitForFunction(
+      (t) => document.getElementById("kombo-kat")?.textContent?.includes(t),
+      "TesB2",
+      { timeout: 8000 }
+    );
     await page.fill("#ctt", "Uji tulis B2");
     await page.click('button[type="submit"]');
     await page.waitForFunction(() => /tercatat/.test(document.body.textContent ?? ""), null, { timeout: 10000 });
@@ -55,7 +67,7 @@ const lapor = (n, ok, d) => {
     process.exitCode = 1;
   } finally {
     await browser.close().catch(() => {});
-    srv.kill();
+    if (srv) srv.kill();
   }
   console.log(hasil.every(Boolean) ? "B21-ALL-OK" : "B21-GAGAL");
   if (!hasil.every(Boolean)) process.exitCode = 1;

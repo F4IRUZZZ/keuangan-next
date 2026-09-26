@@ -52,32 +52,40 @@ export function DialogCatatan({ transaksiId, judul, onBerubah }: Props) {
 
   async function tambah() {
     if (transaksiId === null || !baru.trim()) return;
-    const res = await addCatatan(transaksiId, baru);
-    if ("error" in res) {
-      setPesan(`Gagal (${res.code}): ${res.error}`);
-      return;
+    try {
+      const res = await addCatatan(transaksiId, baru);
+      if ("error" in res) {
+        setPesan(`Gagal (${res.code}): ${res.error}`);
+        return;
+      }
+      setBaru("");
+      setPesan("");
+      await muat();
+      onBerubah();
+    } catch {
+      setPesan("Gagal simpan: penyimpanan perangkat penuh.");
     }
-    setBaru("");
-    setPesan("");
-    await muat();
-    onBerubah();
   }
 
   async function simpanUbah(id: number) {
     if (!editIsi.trim()) return;
-    const out = await updateCatatan(id, editIsi);
-    if (!out) {
-      setPesan("Gagal: catatan tidak ditemukan.");
-      return;
+    try {
+      const out = await updateCatatan(id, editIsi);
+      if (!out) {
+        setPesan("Gagal: catatan tidak ditemukan.");
+        return;
+      }
+      if (typeof out === "object" && "error" in out) {
+        setPesan(`Gagal (${out.code}): ${out.error}`);
+        return;
+      }
+      setEditId(null);
+      setPesan("");
+      await muat();
+      onBerubah();
+    } catch {
+      setPesan("Gagal simpan: penyimpanan perangkat penuh.");
     }
-    if (typeof out === "object" && "error" in out) {
-      setPesan(`Gagal (${out.code}): ${out.error}`);
-      return;
-    }
-    setEditId(null);
-    setPesan("");
-    await muat();
-    onBerubah();
   }
 
   async function hapus(id: number) {
