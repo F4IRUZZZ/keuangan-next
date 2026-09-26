@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { PemilihTema } from "@/components/pemilih-tema";
+import { APP_NAME, APP_VERSION } from "@/lib/app-info";
 import {
   formatRupiah,
   getBatasHarian,
@@ -168,6 +169,13 @@ export default function PengaturanPage() {
       <Card>
         <CardHeader><CardTitle>Zona Bahaya</CardTitle></CardHeader>
         <CardContent><Button variant="destructive" onClick={() => setKonfirmHapus(true)}>Hapus Semua Data di Perangkat Ini</Button></CardContent>
+      </Card>
+      <Card>
+        <CardHeader><CardTitle>Tentang</CardTitle></CardHeader>
+        <CardContent>
+          <p className="text-sm font-semibold">{APP_NAME} v{APP_VERSION}</p>
+          <p className="text-sm text-muted-foreground">Keuangan keluarga, rapi di tangan.</p>
+        </CardContent>
       </Card>
       {hasil && <p className="text-sm text-muted-foreground">{hasil}</p>}
 
