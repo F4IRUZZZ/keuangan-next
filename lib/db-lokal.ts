@@ -531,7 +531,7 @@ export async function bayarHutang(
     jenis: jenisKas,
     jumlah: n,
     produkId: null,
-    kategori: null,
+    kategori: h.arah === "hutang" ? "Hutang" : "Piutang",
     tanggal: tgl,
     hutangId: h.id,
   });
@@ -561,7 +561,7 @@ export async function lunaskanHutang(id: number, tanggal?: string): Promise<Hasi
     jenis: jenisKas,
     jumlah: sisa,
     produkId: null,
-    kategori: null,
+    kategori: h.arah === "hutang" ? "Hutang" : "Piutang",
     tanggal: tgl,
     hutangId: h.id,
   });
