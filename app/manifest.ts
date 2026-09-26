@@ -1,0 +1,26 @@
+import type { MetadataRoute } from "next";
+
+export default function manifest(): MetadataRoute.Manifest {
+  return {
+    name: "FamVault",
+    short_name: "FamVault",
+    description: "Catat pendapatan dan pengeluaran pribadi + keluarga",
+    start_url: "/",
+    scope: "/",
+    display: "standalone",
+    background_color: "#ecf5f0",
+    theme_color: "#059669",
+    icons: [
+      {
+        src: "/ikon-192.png",
+        sizes: "192x192",
+        type: "image/png",
+      },
+      {
+        src: "/ikon-512.png",
+        sizes: "512x512",
+        type: "image/png",
+      },
+    ],
+  };
+}
