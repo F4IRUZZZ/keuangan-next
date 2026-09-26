@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Pencil, Trash2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DialogCatatan } from "@/components/dialog-catatan";
 import { DropdownKategori } from "@/components/dropdown-kategori";
@@ -523,8 +524,8 @@ function IsiTransaksi() {
                       <strong className={`whitespace-nowrap text-xl tabular-nums ${t.jenis === "masuk" ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"}`}>
                         {t.jenis === "masuk" ? "+" : "-"}Rp{formatRupiah(t.jumlah)}
                       </strong>
-                      <Button variant="ghost" size="icon" aria-label="Ubah" onClick={() => bukaUbah(t)}>Ubah</Button>
-                      <Button variant="ghost" size="icon" aria-label="Hapus" onClick={() => setHapusId(t.id)}>Hapus</Button>
+                      <Button variant="ghost" size="icon" aria-label="Ubah" title="Ubah" onClick={() => bukaUbah(t)}><Pencil aria-hidden="true" /></Button>
+                      <Button variant="ghost" size="icon" aria-label="Hapus" title="Hapus" onClick={() => setHapusId(t.id)}><Trash2 aria-hidden="true" /></Button>
                       <DialogCatatan transaksiId={t.id} judul={judul(t, notes)} onBerubah={muat} />
                     </CardContent>
                   </Card>

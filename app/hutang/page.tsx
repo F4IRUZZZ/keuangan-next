@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Check, Eye, HandCoins, Trash2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
@@ -265,20 +266,22 @@ export default function HutangPage() {
                   <div className="mt-2 flex flex-wrap gap-2">
                     {h.status === "belum" && (
                       <>
-                        <Button size="sm" variant="secondary" onClick={() => bukaBayar(h)}>Cicil</Button>
-                        <Button size="sm" variant="secondary" onClick={() => jalankanLunas(h.id)}>Lunaskan</Button>
+                        <Button size="icon" variant="secondary" aria-label="Cicil" title="Cicil" onClick={() => bukaBayar(h)}><HandCoins aria-hidden="true" /></Button>
+                        <Button size="icon" variant="secondary" aria-label="Lunaskan" title="Lunaskan" onClick={() => jalankanLunas(h.id)}><Check aria-hidden="true" /></Button>
                       </>
                     )}
                     {h.status === "belum" && (
-                      <Button size="sm" variant="ghost" onClick={() => setHapusId(h.id)}>Hapus</Button>
+                      <Button size="icon" variant="ghost" aria-label="Hapus" title="Hapus" onClick={() => setHapusId(h.id)}><Trash2 aria-hidden="true" /></Button>
                     )}
                     <Button
-                      size="sm"
+                      size="icon"
                       variant="ghost"
                       aria-expanded={rincianId === h.id}
+                      aria-label={rincianId === h.id ? "Tutup rincian" : "Rincian"}
+                      title={rincianId === h.id ? "Tutup rincian" : "Rincian"}
                       onClick={() => toggleRincian(h)}
                     >
-                      {rincianId === h.id ? "Tutup rincian" : "Rincian"}
+                      <Eye aria-hidden="true" />
                     </Button>
                   </div>
                   {rincianId === h.id && (
