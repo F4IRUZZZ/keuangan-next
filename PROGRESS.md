@@ -87,6 +87,7 @@ _Belum ada usulan._
 
 | Tanggal | Perubahan | Uji | PR |
 |---|---|---|---|
+| 2026-09-27 | Fix overflow HP: grid blowout form transaksi | pra doc=523 -> pasca 415, audit 18 kombinasi NOL-LUBER, B22/F13 ALL-OK | #41 |
 | 2026-09-27 | F2.4 merged: tombol ikon + logo transparan | 8 suite ALL-OK, tsc, build | #39 |
 | 2026-09-27 | F2.3 merged: 16 shot paritas + mini-bar + judul emerald | F15/F16/F20/F22 ALL-OK, tsc, build | #37 |
 | 2026-09-27 | F2.2 merged: warning/info + segmen tema + id-ID + badge amber | F22 10/10, F15/F16/F20 ALL-OK, tsc, build | #35 |
