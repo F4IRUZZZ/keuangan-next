@@ -126,6 +126,7 @@ export default function Dashboard() {
             datasets: [{ data: [saldo.masuk, saldo.keluar], backgroundColor: ["#059669", "#dc2626"], borderRadius: 8 }],
           },
           options: {
+            maintainAspectRatio: false,
             plugins: { legend: { display: false }, tooltip: { callbacks: { label: labelRp } } },
             scales: { y: { beginAtZero: true, ticks: { color: ticks } }, x: { ticks: { color: ticks } } },
           },
@@ -144,6 +145,7 @@ export default function Dashboard() {
             ],
           },
           options: {
+            maintainAspectRatio: false,
             plugins: {
               legend: { position: "bottom", labels: { color: ticks, boxWidth: 12 } },
               tooltip: { callbacks: { label: labelRp } },
@@ -161,6 +163,7 @@ export default function Dashboard() {
             datasets: [{ data: kat.map((r) => r.total), backgroundColor: ["#059669", "#10b981", "#34d399", "#f59e0b", "#3b82f6"] }],
           },
           options: {
+            maintainAspectRatio: false,
             plugins: {
               legend: { position: "bottom" },
               tooltip: { callbacks: { label: labelRp } },
@@ -248,14 +251,18 @@ export default function Dashboard() {
                 <TabsTrigger value="kategori">Kategori</TabsTrigger>
               </TabsList>
               <TabsContent value="arus">
-                <canvas id="grafik-arus" ref={refArus} height={220} />
+                <div className="h-64">
+                  <canvas id="grafik-arus" ref={refArus} height={220} />
+                </div>
               </TabsContent>
               <TabsContent value="minggu">
-                <canvas id="grafik-minggu" ref={refMinggu} height={220} aria-label="Grafik batang pemasukan dan pengeluaran per hari Senin sampai Minggu" />
+                <div className="h-64">
+                  <canvas id="grafik-minggu" ref={refMinggu} height={220} aria-label="Grafik batang pemasukan dan pengeluaran per hari Senin sampai Minggu" />
+                </div>
               </TabsContent>
               <TabsContent value="kategori">
                 {kat.length > 0 ? (
-                  <div className="mx-auto w-full max-w-[560px]">
+                  <div className="mx-auto h-64 w-full max-w-[560px]">
                     <canvas id="grafik-kategori" ref={refDonat} height={220} />
                   </div>
                 ) : (
