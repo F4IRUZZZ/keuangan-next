@@ -90,6 +90,7 @@ _Belum ada usulan._
 |---|---|---|---|
 | 2026-09-27 | F3.2 closed: deploy live + PWA install + pesawat HP 5/5 | famvault-next.vercel.app | - |
 | 2026-09-27 | F3.3 closed: SnapDeploy/TiDB kosong, tanpa migrasi | bukti screenshot dashboard | - |
+| 2026-09-27 | Label versi v1.0.0 merged (sidebar + Tentang) | smoke 2 halaman, tsc, build | #55 |
 | 2026-09-27 | Indikator koneksi dinamis merged (badge offline saat offline) | F31 +2 assert, F15/F16 ALL-OK, tsc, build | #53 |
 | 2026-09-27 | Audit predeploy merged: B21 hidup + wipe tema + storage error eksplisit | B21/F13/F11/B22/F32 ALL-OK, tsc, build | #49 |
 | 2026-09-27 | Kas auto cicil/lunas berkategori Hutang/Piutang (divergen vanilla) | F13 +2 assert, B22/F15/F16 ALL-OK | #47 |
