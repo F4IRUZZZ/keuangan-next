@@ -57,6 +57,8 @@ export default function Dashboard() {
     masuk: [0, 0, 0, 0, 0, 0, 0],
     keluar: [0, 0, 0, 0, 0, 0, 0],
   });
+  // Pemicu gambar ulang grafik saat tema diganti (warna grid/tick baca .dark).
+  const [revisiGrafik, setRevisiGrafik] = useState(0);
   const refArus = useRef<HTMLCanvasElement>(null);
   const refMinggu = useRef<HTMLCanvasElement>(null);
   const refDonat = useRef<HTMLCanvasElement>(null);
@@ -175,7 +177,15 @@ export default function Dashboard() {
       charts.current.forEach((c) => c.destroy());
       charts.current = [];
     };
-  }, [saldo, kat, minggu, tabGrafik]);
+  }, [saldo, kat, minggu, tabGrafik, revisiGrafik]);
+
+  useEffect(() => {
+    function sinkron() {
+      setRevisiGrafik((n) => n + 1);
+    }
+    window.addEventListener("famvault-tema", sinkron);
+    return () => window.removeEventListener("famvault-tema", sinkron);
+  }, []);
 
   return (
     <main className="mx-auto w-full max-w-6xl space-y-6 p-4 pb-16 md:p-8">
