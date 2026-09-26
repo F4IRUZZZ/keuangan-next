@@ -238,7 +238,7 @@ export default function Dashboard() {
           <Card><CardContent className="pt-4"><canvas id="grafik-minggu" ref={refMinggu} height={220} aria-label="Grafik batang pemasukan dan pengeluaran per hari Senin sampai Minggu" /></CardContent></Card>
         </div>
         {kat.length > 0 && (
-          <Card><CardContent className="pt-4"><canvas id="grafik-kategori" ref={refDonat} height={220} /></CardContent></Card>
+          <Card className="mx-auto w-full max-w-[560px]"><CardContent className="pt-4"><canvas id="grafik-kategori" ref={refDonat} height={220} /></CardContent></Card>
         )}
         </>
       )}
