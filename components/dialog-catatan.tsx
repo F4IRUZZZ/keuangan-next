@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { NotebookPen } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -87,8 +88,8 @@ export function DialogCatatan({ transaksiId, judul, onBerubah }: Props) {
 
   return (
     <Dialog open={buka} onOpenChange={setBuka}>
-      <Button variant="ghost" size="sm" onClick={() => setBuka(true)} aria-label={`Catatan untuk ${judul}`}>
-        Catatan{daftar.length > 0 ? ` (${daftar.length})` : ""}
+      <Button variant="ghost" size="icon" onClick={() => setBuka(true)} aria-label={`Catatan untuk ${judul}`} title={daftar.length > 0 ? `Catatan (${daftar.length})` : "Catatan"}>
+        <NotebookPen aria-hidden="true" />
       </Button>
       <DialogContent aria-label="Catatan transaksi">
         <DialogHeader>

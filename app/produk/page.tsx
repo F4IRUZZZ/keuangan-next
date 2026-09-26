@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Pencil, Trash2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
@@ -156,8 +157,8 @@ export default function ProdukPage() {
                         {p.kategori} - dipakai {pakai[p.id] ?? 0} transaksi
                       </span>
                     </span>
-                    <Button variant="ghost" size="sm" onClick={() => bukaUbah(p)}>Ubah</Button>
-                    <Button variant="ghost" size="sm" onClick={() => setHapusId(p.id)}>Hapus</Button>
+                    <Button variant="ghost" size="icon" aria-label="Ubah" title="Ubah" onClick={() => bukaUbah(p)}><Pencil aria-hidden="true" /></Button>
+                    <Button variant="ghost" size="icon" aria-label="Hapus" title="Hapus" onClick={() => setHapusId(p.id)}><Trash2 aria-hidden="true" /></Button>
                   </li>
                 ))}
               </ul>
