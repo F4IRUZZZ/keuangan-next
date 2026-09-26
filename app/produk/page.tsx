@@ -111,7 +111,7 @@ export default function ProdukPage() {
   return (
     <main className="mx-auto w-full max-w-6xl space-y-6 p-4 pb-16 md:p-8">
       <div className="flex flex-wrap items-center gap-3">
-        <h1 className="text-3xl font-bold">Produk</h1>
+        <h1 className="text-3xl font-bold text-emerald-700 dark:text-emerald-300">Produk</h1>
         <Badge variant="secondary">Offline - Perangkat ini</Badge>
       </div>
       <div className="grid items-start gap-6 lg:grid-cols-[420px_minmax(0,1fr)]">

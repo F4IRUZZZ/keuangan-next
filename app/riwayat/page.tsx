@@ -48,7 +48,7 @@ export default function Riwayat() {
   return (
     <main className="mx-auto w-full max-w-6xl space-y-6 p-4 pb-16 md:p-8">
       <div className="flex flex-wrap items-center gap-3">
-        <h1 className="text-3xl font-bold">Riwayat</h1>
+        <h1 className="text-3xl font-bold text-emerald-700 dark:text-emerald-300">Riwayat</h1>
         <Badge variant="secondary">Baca-saja • ubah di menu asal</Badge>
       </div>
       <Tabs value={tab} onValueChange={setTab}>
