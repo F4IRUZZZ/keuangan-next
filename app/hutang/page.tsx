@@ -91,6 +91,9 @@ export default function HutangPage() {
       setKet("");
       setTanggal(tanggalHariIni());
       await muat();
+    } catch {
+      setPesan("Gagal simpan: penyimpanan perangkat penuh.");
+      setPesanOk(false);
     } finally {
       setMenyimpan(false);
     }
@@ -107,30 +110,39 @@ export default function HutangPage() {
     if (bayarId === null) return;
     console.log("DBG-JALANKAN-BAYAR id=" + bayarId);
     const n = Number(String(bayarNom).replace(/[^0-9]/g, "")) || 0;
-    const out = await bayarHutang(bayarId, n, bayarTgl || undefined);
-    if ("error" in out) {
-      setBayarPesan(`Gagal (${out.code}): ${out.error}`);
-      return;
+    try {
+      const out = await bayarHutang(bayarId, n, bayarTgl || undefined);
+      if ("error" in out) {
+        setBayarPesan(`Gagal (${out.code}): ${out.error}`);
+        return;
+      }
+      setBayarId(null);
+      const s = out.data.jumlah - out.data.dibayar;
+      setPesan(out.data.status === "lunas" ? "Lunas + tercatat di kas." : `Bayaran tercatat, sisa Rp${formatRupiah(s)}.`);
+      setPesanOk(true);
+      await muat();
+      if (rincianId === out.data.id) setRincianRows(await getCicilan(out.data.id));
+    } catch {
+      setBayarPesan("Gagal simpan: penyimpanan perangkat penuh.");
     }
-    setBayarId(null);
-    const s = out.data.jumlah - out.data.dibayar;
-    setPesan(out.data.status === "lunas" ? "Lunas + tercatat di kas." : `Bayaran tercatat, sisa Rp${formatRupiah(s)}.`);
-    setPesanOk(true);
-    await muat();
-    if (rincianId === out.data.id) setRincianRows(await getCicilan(out.data.id));
   }
 
   async function jalankanLunas(id: number) {
     console.log("DBG-JALANKAN-LUNAS id=" + id);
-    const out = await lunaskanHutang(id);
-    if ("error" in out) {
-      setPesan(`Gagal (${out.code}): ${out.error}`);
+    try {
+      const out = await lunaskanHutang(id);
+      if ("error" in out) {
+        setPesan(`Gagal (${out.code}): ${out.error}`);
+        setPesanOk(false);
+        return;
+      }
+      setPesan("Lunas + tercatat di kas.");
+      setPesanOk(true);
+      await muat();
+    } catch {
+      setPesan("Gagal simpan: penyimpanan perangkat penuh.");
       setPesanOk(false);
-      return;
     }
-    setPesan("Lunas + tercatat di kas.");
-    setPesanOk(true);
-    await muat();
   }
 
   async function jalankanHapus() {

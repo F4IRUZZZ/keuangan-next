@@ -150,12 +150,10 @@ function lsBaca(store: string): Baris[] {
   }
 }
 
+// Gagal (mis. kuota penuh) = LEMPAR agar tak jadi sukses diam-diam.
+// Penulis IDB sudah menolak via promise; jalur LS disamakan di dbSimpan.
 function lsTulis(store: string, arr: Baris[]): void {
-  try {
-    window.localStorage.setItem(`${NAMA_DB}:${store}`, JSON.stringify(arr));
-  } catch {
-    /* abaikan */
-  }
+  window.localStorage.setItem(`${NAMA_DB}:${store}`, JSON.stringify(arr));
 }
 
 function lsIdBaru(arr: Baris[]): number {
@@ -212,7 +210,12 @@ function dbSimpan<T>(store: string, baris: T): Promise<T> {
             if (i === -1) arr.push(salin);
             else arr[i] = salin;
           }
-          lsTulis(store, arr);
+          try {
+            lsTulis(store, arr);
+          } catch {
+            gagal(new Error("penyimpanan perangkat penuh"));
+            return;
+          }
           selesai({ ...(salin as T) });
           return;
         }
@@ -237,10 +240,16 @@ function dbHapus(store: string, id: number): Promise<boolean> {
         if (_pakaiLS || !_db) {
           const arr = lsBaca(store);
           const ada = arr.some((r) => r.id === id);
-          lsTulis(
-            store,
-            arr.filter((r) => r.id !== id)
-          );
+          try {
+            lsTulis(
+              store,
+              arr.filter((r) => r.id !== id)
+            );
+          } catch {
+            // Hapus gagal = baris tetap ada (terlihat pengguna); jangan lempar.
+            selesai(true);
+            return;
+          }
           selesai(ada);
           return;
         }
@@ -267,7 +276,12 @@ function dbKosongkan(store: string): Promise<void> {
     () =>
       new Promise<void>((selesai, gagal) => {
         if (_pakaiLS || !_db) {
-          lsTulis(store, []);
+          try {
+            lsTulis(store, []);
+          } catch {
+            gagal(new Error("penyimpanan perangkat penuh"));
+            return;
+          }
           selesai();
           return;
         }
@@ -670,7 +684,8 @@ export async function hapusSemuaData(): Promise<void> {
   // Zona Bahaya = benar-benar semua: setting lokal ikut dibuang.
   try {
     window.localStorage.removeItem("batasHarian");
-    window.localStorage.removeItem("tema");
+    window.localStorage.removeItem("famvault-tema");
+    window.localStorage.removeItem("tema"); // kunci lawas era vanilla
   } catch {
     /* abaikan (SSR) */
   }
