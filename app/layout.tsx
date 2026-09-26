@@ -18,6 +18,7 @@ export const metadata: Metadata = {
 };
 
 import { Nav } from "@/components/nav";
+import { DaftarSW } from "@/components/daftar-sw";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -34,6 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="min-h-full flex flex-col">
+        <DaftarSW />
         <Nav />
         <div className="pb-24 lg:pb-0 lg:pl-60">{children}</div>
       </body>
