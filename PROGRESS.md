@@ -87,6 +87,7 @@ _Belum ada usulan._
 
 | Tanggal | Perubahan | Uji | PR |
 |---|---|---|---|
+| 2026-09-27 | Kas auto cicil/lunas berkategori Hutang/Piutang (divergen vanilla) | F13 +2 assert, B22/F15/F16 ALL-OK | #47 |
 | 2026-09-27 | F3.1 merged: static export + SW + offline desktop | F31 6/6, F15/F20 ALL-OK, tsc, build | #45 |
 | 2026-09-27 | F1.5d merged: default Minggu Ini + placeholder kecil | F15/F22/B1 ALL-OK, tsc, build | #43 |
 | 2026-09-27 | Fix overflow HP: grid blowout form transaksi | pra doc=523 -> pasca 415, audit 18 kombinasi NOL-LUBER, B22/F13 ALL-OK | #41 |
