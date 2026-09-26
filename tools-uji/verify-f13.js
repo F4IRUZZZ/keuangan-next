@@ -49,6 +49,12 @@ const lapor = (n, ok, d) => {
     const bayarHilang = await page.locator("li", { hasText: "BudiF13" }).getByRole("button", { name: /^Cicil$/ }).count();
     if (bayarHilang !== 0) throw new Error("tombol cicil masih ada setelah lunas");
     lapor("lunaskan + audit", true);
+    // Kas auto pelunasan berkategori Hutang (bukan Lainnya)
+    await page.goto(`${BASE}/transaksi`, { waitUntil: "load", timeout: 120000 });
+    await page.waitForFunction(() => /Pelunasan hutang ke BudiF13/.test(document.body.textContent ?? ""), null, { polling: 100, timeout: 30000 });
+    await page.waitForFunction(() => /Hutang - \d{2}\/\d{2}\/\d{4}/.test(document.body.textContent ?? ""), null, { polling: 100, timeout: 30000 });
+    lapor("kas auto kategori Hutang", true);
+    await page.goto(`${BASE}/hutang`, { waitUntil: "load", timeout: 120000 });
     // Hapus lunas via lib langsung tak ada UI -> cek tombol hapus hilang
     const hapusAda = await page.locator("li", { hasText: "BudiF13" }).getByRole("button", { name: /^Hapus$/ }).count();
     if (hapusAda !== 0) throw new Error("tombol hapus masih ada untuk lunas");
@@ -126,6 +132,13 @@ const lapor = (n, ok, d) => {
       return /HUTANG/.test(t) && /PIUTANG/.test(t) && /Sisa hutang: Rp80\.000/.test(t) && /Sisa piutang: Rp70\.000/.test(t);
     }, null, { timeout: 30000 }));
     lapor("badge arah + subtotal terpecah", true);
+    // Kas auto pelunasan piutang berkategori Piutang
+    await page.locator("li", { hasText: "ArahP" }).getByRole("button", { name: /^Lunaskan$/ }).click();
+    await page.waitForFunction(() => /Lunas \+ tercatat/.test(document.body.textContent ?? ""), null, { polling: 100, timeout: 30000 });
+    await page.goto(`${BASE}/transaksi`, { waitUntil: "load", timeout: 120000 });
+    await page.waitForFunction(() => /Pelunasan piutang ArahP/.test(document.body.textContent ?? ""), null, { polling: 100, timeout: 30000 });
+    await page.waitForFunction(() => /Piutang - \d{2}\/\d{2}\/\d{4}/.test(document.body.textContent ?? ""), null, { polling: 100, timeout: 30000 });
+    lapor("kas auto kategori Piutang", true);
     // Zona Bahaya: set batas -> Dialog hapus -> batas ikut hilang
     await page.goto(`${BASE}/pengaturan`, { waitUntil: "load", timeout: 120000 });
     await page.fill("#batas", "123456");
