@@ -14,9 +14,9 @@ import {
 const NAV = [
   { href: "/", label: "Dashboard", ikon: LayoutDashboard },
   { href: "/transaksi", label: "Transaksi", ikon: ArrowLeftRight },
-  { href: "/riwayat", label: "Riwayat", ikon: History },
   { href: "/produk", label: "Produk", ikon: Package },
   { href: "/hutang", label: "Hutang", ikon: HandCoins },
+  { href: "/riwayat", label: "Riwayat", ikon: History },
   { href: "/pengaturan", label: "Pengaturan", ikon: Settings },
 ];
 
