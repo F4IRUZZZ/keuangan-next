@@ -47,6 +47,7 @@
 - [x] F2.1: dock final (hapus demo) + hero ala vanilla + polish gelap + audit spacing + angka ticker warisi warna (PR #33 merged)
 - [x] F2.2: palet warning/info + segmen tema Sistem|Terang|Gelap + koma-titik id-ID (breadcrumb SKIP, Geist verifikasi) (PR #35 merged)
 - [x] F2.3: paritas visual vs vanilla + mini-bar kategori + judul emerald (T3/T4 backlog) (PR #37 merged)
+- [x] F2.4: tombol aksi jadi ikon + logo transparan gelap (T4 tombol-ikon selesai) (PR #39 merged)
 
 - Kriteria: nilai berdampingan vs referensi DompetKu.
 
@@ -67,7 +68,7 @@
 - [ ] Vanilla: DompetKu-3/4, push 39 commit, HP fisik, onboarding
 - [ ] Next: Dialog konfirmasi cantik (sementara confirm())
 - [ ] Next (temuan paritas F2.3): command palette Cari/aksi Ctrl+K ala vanilla (fase sendiri)
-- [ ] Next (temuan paritas F2.3): set ikon kategori + tombol-ikon baris transaksi ala vanilla (fase sendiri)
+- [ ] Next (temuan paritas F2.3): set ikon kategori baris transaksi ala vanilla (fase sendiri; tombol-ikon selesai di F2.4)
 
 ## D. Arsip vanilla (beku, hanya dibaca)
 
@@ -86,6 +87,7 @@ _Belum ada usulan._
 
 | Tanggal | Perubahan | Uji | PR |
 |---|---|---|---|
+| 2026-09-27 | F2.4 merged: tombol ikon + logo transparan | 8 suite ALL-OK, tsc, build | #39 |
 | 2026-09-27 | F2.3 merged: 16 shot paritas + mini-bar + judul emerald | F15/F16/F20/F22 ALL-OK, tsc, build | #37 |
 | 2026-09-27 | F2.2 merged: warning/info + segmen tema + id-ID + badge amber | F22 10/10, F15/F16/F20 ALL-OK, tsc, build | #35 |
 | 2026-09-27 | F2.1 merged: hapus Dock/demo + radius 16px + token gelap emerald + hero vanilla + ticker warisi warna | matriks 12 shot 2 tema, F15/F16/F20 ALL-OK, tsc, build | #33 |
