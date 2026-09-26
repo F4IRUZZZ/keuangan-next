@@ -184,7 +184,7 @@ export default function Dashboard() {
         <Badge variant="secondary">Offline • Perangkat ini</Badge>
       </div>
       <div className="grid grid-cols-2 gap-3">
-        <Card>
+        <Card className="transition-transform hover:-translate-y-0.5">
           <CardContent className="pt-4">
             <p className="text-xs text-muted-foreground">Total masuk</p>
             <p className="text-2xl font-bold text-emerald-600 tabular-nums dark:text-emerald-400">
@@ -192,7 +192,7 @@ export default function Dashboard() {
             </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="transition-transform hover:-translate-y-0.5">
           <CardContent className="pt-4">
             <p className="text-xs text-muted-foreground">Total keluar</p>
             <p className="text-2xl font-bold text-red-600 tabular-nums dark:text-red-400">
@@ -201,13 +201,13 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </div>
-      <Card className="bg-emerald-700 text-white dark:bg-emerald-900">
-        <CardContent className="pt-4">
-          <p className="text-sm opacity-85">Saldo</p>
-          <p className={`text-4xl font-bold tabular-nums${saldo.saldo < 0 ? " text-red-200" : ""}`}>
+      <Card className="bg-[radial-gradient(120%_160%_at_85%_10%,rgba(251,191,36,0.35),transparent_55%),radial-gradient(120%_180%_at_10%_90%,rgba(52,211,153,0.4),transparent_55%),linear-gradient(135deg,#047857,#059669_55%,#10b981)] text-white dark:bg-[radial-gradient(120%_160%_at_85%_10%,rgba(251,191,36,0.35),transparent_55%),radial-gradient(120%_180%_at_10%_90%,rgba(52,211,153,0.4),transparent_55%),linear-gradient(135deg,#065f46,#047857_55%,#059669)]">
+        <CardContent className="p-5">
+          <p className="mb-1 text-[0.85rem] font-semibold opacity-85">Saldo</p>
+          <p className={`text-4xl font-bold tabular-nums${saldo.saldo < 0 ? " text-red-200 dark:text-red-200" : ""}`}>
             Rp<NumberTicker value={saldo.saldo} />
           </p>
-          <p className="text-sm opacity-85">{LABEL_PERIODE[periode]}</p>
+          <p className="mt-1.5 text-xs opacity-85">{LABEL_PERIODE[periode]}</p>
         </CardContent>
       </Card>
       <div className="flex flex-wrap gap-2">
