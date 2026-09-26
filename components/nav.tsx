@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   ArrowLeftRight,
   HandCoins,
+  History,
   LayoutDashboard,
   Package,
   Settings,
@@ -13,6 +14,7 @@ import {
 const NAV = [
   { href: "/", label: "Dashboard", ikon: LayoutDashboard },
   { href: "/transaksi", label: "Transaksi", ikon: ArrowLeftRight },
+  { href: "/riwayat", label: "Riwayat", ikon: History },
   { href: "/produk", label: "Produk", ikon: Package },
   { href: "/hutang", label: "Hutang", ikon: HandCoins },
   { href: "/pengaturan", label: "Pengaturan", ikon: Settings },
@@ -44,7 +46,7 @@ export function Nav() {
       </nav>
       {/* HP + tablet: bottom-nav ala vanilla (ikon + label + titik aktif) */}
       <nav aria-label="Navigasi utama" className="fixed inset-x-0 bottom-0 z-40 border-t bg-background/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden">
-        <div className="mx-auto grid w-full max-w-6xl grid-cols-5 px-2 py-1">
+        <div className="mx-auto grid w-full max-w-6xl grid-cols-6 px-2 py-1">
           {NAV.map((n) => {
             const aktif = n.href === "/" ? path === "/" : path.startsWith(n.href);
             return (
