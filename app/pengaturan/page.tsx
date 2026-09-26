@@ -12,6 +12,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { ToggleTema } from "@/components/toggle-tema";
 import {
   formatRupiah,
   getBatasHarian,
@@ -118,6 +119,13 @@ export default function PengaturanPage() {
         <h1 className="text-3xl font-bold">Pengaturan</h1>
         <Badge variant="secondary">Offline • Perangkat ini</Badge>
       </div>
+      <Card>
+        <CardHeader><CardTitle>Tampilan</CardTitle></CardHeader>
+        <CardContent className="flex flex-wrap items-center gap-3">
+          <ToggleTema />
+          <p className="text-sm text-muted-foreground">Pilihan tersimpan di perangkat ini.</p>
+        </CardContent>
+      </Card>
       <Card>
         <CardHeader><CardTitle>Ekspor Data</CardTitle></CardHeader>
         <CardContent><Button onClick={eksporCSV}>Ekspor CSV</Button></CardContent>

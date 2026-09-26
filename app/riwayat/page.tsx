@@ -108,7 +108,7 @@ export default function Riwayat() {
                             {h.status === "lunas" ? "Lunas" : "Belum"}
                           </Badge>
                           {h.status === "belum" && h.jatuhTempo && h.jatuhTempo < hariIni && (
-                            <Badge variant="destructive">LEWAT TEMPO</Badge>
+                            <Badge variant="warning">LEWAT TEMPO</Badge>
                           )}
                         </div>
                         <p className="text-xs text-muted-foreground">

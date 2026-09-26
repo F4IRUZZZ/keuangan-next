@@ -92,14 +92,13 @@ function isoSeninPlus(offset) {
     await page.waitForFunction(() => /TesSenin • \d{2}\/\d{2}\/\d{4}/.test(document.body.textContent ?? ""), null, { timeout: 10000 });
     lapor("riwayat judul fallback + meta", true);
     // Saldo minus (keluar 50000, masuk 0) = merah (tunggu count-up selesai dulu)
-    // Catatan: NumberTicker pakai format en-US ("50,000"); unifikasi id-ID dijadwalkan di F2.
     await page.waitForFunction(() => {
       const ps = [...document.querySelectorAll("p.text-4xl")];
-      return ps.some((p) => /50,000/.test(p.textContent ?? ""));
+      return ps.some((p) => /50\.000/.test(p.textContent ?? ""));
     }, null, { timeout: 15000 });
     const minusMerah = await page.evaluate(() => {
       const ps = [...document.querySelectorAll("p.text-4xl")];
-      const el = ps.find((p) => /50,000/.test(p.textContent ?? ""));
+      const el = ps.find((p) => /50\.000/.test(p.textContent ?? ""));
       return !!el && el.className.includes("text-red-200");
     });
     if (!minusMerah) throw new Error("saldo minus tak merah");

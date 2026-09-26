@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ToggleTema } from "@/components/toggle-tema";
 import {
   ArrowLeftRight,
   HandCoins,
@@ -54,6 +55,9 @@ export function Nav() {
               </Link>
             );
           })}
+        </div>
+        <div className="mt-auto border-t p-3">
+          <ToggleTema />
         </div>
       </nav>
       {/* HP + tablet: bottom-nav ala vanilla (ikon + label + titik aktif) */}
