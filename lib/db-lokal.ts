@@ -85,7 +85,15 @@ export function tanggalHariIni(d = new Date()): string {
 }
 
 export function validTanggalLokal(s: unknown): boolean {
-  return /^\d{4}-\d{2}-\d{2}$/.test(String(s ?? ""));
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(s ?? ""));
+  if (!m) return false;
+  const th = Number(m[1]);
+  const bl = Number(m[2]);
+  const tg = Number(m[3]);
+  if (bl < 1 || bl > 12 || tg < 1) return false;
+  // Cek kalender nyata (30 Feb / 31 Apr lolos regex tapi invalid).
+  const d = new Date(th, bl - 1, tg);
+  return d.getFullYear() === th && d.getMonth() === bl - 1 && d.getDate() === tg;
 }
 
 // --- Lapisan simpan rendah: IndexedDB, fallback localStorage ---
@@ -604,6 +612,9 @@ export async function deleteHutang(id: number): Promise<boolean | { error: strin
   const h = await dbAmbil<Hutang>("hutang", Number(id));
   if (!h) return false;
   if (h.status === "lunas") return { error: "Sudah lunas, tidak boleh dihapus", code: 400 };
+  // Cascade: hapus kas auto + catatan cicilan agar tak jadi orphan di saldo/riwayat.
+  const cicilan = await getCicilan(Number(id));
+  for (const t of cicilan) await deleteTransaksi(t.id);
   await dbHapus("hutang", Number(id));
   return true;
 }
@@ -652,6 +663,73 @@ export async function getRingkasanKategori(filter?: FilterTanggal): Promise<Ring
 }
 
 // --- Impor + reset (Pengaturan) ---
+function validBarisProduk(b: unknown): b is Produk {
+  const r = b as Record<string, unknown>;
+  return (
+    !!r &&
+    (r.id === undefined || r.id === null || Number.isInteger(Number(r.id))) &&
+    typeof r.nama === "string" &&
+    r.nama.trim().length > 0 &&
+    (r.kategori === undefined || r.kategori === null || typeof r.kategori === "string")
+  );
+}
+
+function validBarisTransaksi(b: unknown): b is Transaksi {
+  const r = b as Record<string, unknown>;
+  return (
+    !!r &&
+    (r.id === undefined || r.id === null || Number.isInteger(Number(r.id))) &&
+    (r.jenis === "masuk" || r.jenis === "keluar") &&
+    typeof r.jumlah === "number" &&
+    Number.isFinite(r.jumlah) &&
+    r.jumlah > 0 &&
+    (r.produkId === undefined || r.produkId === null || Number.isInteger(Number(r.produkId))) &&
+    (r.kategori === undefined || r.kategori === null || typeof r.kategori === "string") &&
+    typeof r.tanggal === "string" &&
+    validTanggalLokal(r.tanggal) &&
+    (r.hutangId === undefined || r.hutangId === null || Number.isInteger(Number(r.hutangId)))
+  );
+}
+
+function validBarisCatatan(b: unknown): b is Catatan {
+  const r = b as Record<string, unknown>;
+  return (
+    !!r &&
+    (r.id === undefined || r.id === null || Number.isInteger(Number(r.id))) &&
+    Number.isInteger(Number(r.transaksiId)) &&
+    typeof r.isi === "string" &&
+    r.isi.trim().length > 0
+  );
+}
+
+function validBarisHutang(b: unknown): b is Hutang {
+  const r = b as Record<string, unknown>;
+  return (
+    !!r &&
+    (r.id === undefined || r.id === null || Number.isInteger(Number(r.id))) &&
+    (r.arah === "hutang" || r.arah === "piutang") &&
+    typeof r.pihak === "string" &&
+    r.pihak.trim().length > 0 &&
+    typeof r.jumlah === "number" &&
+    Number.isFinite(r.jumlah) &&
+    r.jumlah > 0 &&
+    typeof r.dibayar === "number" &&
+    Number.isFinite(r.dibayar) &&
+    r.dibayar >= 0 &&
+    r.dibayar <= r.jumlah &&
+    typeof r.tanggal === "string" &&
+    validTanggalLokal(r.tanggal) &&
+    (r.jatuhTempo === undefined ||
+      r.jatuhTempo === null ||
+      (typeof r.jatuhTempo === "string" && validTanggalLokal(r.jatuhTempo))) &&
+    typeof r.keterangan === "string" &&
+    (r.status === "belum" || r.status === "lunas") &&
+    (r.transaksiIdLunas === undefined ||
+      r.transaksiIdLunas === null ||
+      Number.isInteger(Number(r.transaksiIdLunas)))
+  );
+}
+
 export async function imporBackup(data: {
   produk?: Produk[];
   transaksi?: Transaksi[];
@@ -666,6 +744,35 @@ export async function imporBackup(data: {
     !Array.isArray(data.catatan)
   )
     throw new Error("Format backup tidak dikenal");
+  // Validasi SEMUA isi dulu sebelum wipe — backup korup tak boleh hancurkan data baik.
+  const cek = (
+    arr: unknown[],
+    valid: (b: unknown) => boolean,
+    nama: string
+  ): void => {
+    const i = arr.findIndex((b) => !valid(b));
+    if (i !== -1) throw new Error(`Isi backup ${nama} rusak pada baris ${i + 1}`);
+  };
+  cek(data.produk, validBarisProduk, "produk");
+  cek(data.transaksi, validBarisTransaksi, "transaksi");
+  cek(data.catatan, validBarisCatatan, "catatan");
+  cek(data.hutang, validBarisHutang, "hutang");
+  // Cek referensi antar-tabel agar tak ada orphan.
+  const idTx = new Set(data.transaksi.map((t) => Number(t.id)));
+  const idHutang = new Set(data.hutang.map((h) => Number(h.id)));
+  for (const c of data.catatan)
+    if (!idTx.has(Number(c.transaksiId)))
+      throw new Error("Isi backup catatan menunjuk transaksi yang tak ada");
+  for (const t of data.transaksi)
+    if (t.hutangId !== null && t.hutangId !== undefined && !idHutang.has(Number(t.hutangId)))
+      throw new Error("Isi backup transaksi menunjuk hutang yang tak ada");
+  for (const h of data.hutang)
+    if (
+      h.transaksiIdLunas !== null &&
+      h.transaksiIdLunas !== undefined &&
+      !idTx.has(Number(h.transaksiIdLunas))
+    )
+      throw new Error("Isi backup hutang menunjuk transaksi pelunasan yang tak ada");
   await hapusSemuaData();
   for (const s of ["produk", "transaksi", "catatan", "hutang"] as const)
     for (const baris of ((data[s] ?? []) as unknown as Baris[])) await dbSimpan(s, { ...baris });

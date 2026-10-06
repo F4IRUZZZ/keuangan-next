@@ -19,6 +19,7 @@ import {
   kategoriOf,
   muatSemuaCatatan,
   segarkanCacheProduk,
+  validTanggalLokal,
   type Catatan,
   type RingkasKat,
   type Saldo,
@@ -36,7 +37,9 @@ const LABEL_PERIODE: Record<Periode, string> = {
 };
 
 // '2026-09-22' -> indeks Senin=0..Minggu=6 (Date lokal, bukan UTC).
-function indeksHari(tanggal: string): number {
+// Tanggal korup (mis. dari backup lama) -> null agar dilewati, bukan NaN.
+function indeksHari(tanggal: string): number | null {
+  if (!validTanggalLokal(tanggal)) return null;
   const p = String(tanggal).split("-");
   const d = new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]));
   return (d.getDay() + 6) % 7;
@@ -96,6 +99,7 @@ export default function Dashboard() {
         if (filter?.dari && t.tanggal < filter.dari) continue;
         if (filter?.sampai && t.tanggal > filter.sampai) continue;
         const i = indeksHari(t.tanggal);
+        if (i === null) continue;
         if (t.jenis === "masuk") mH[i] += t.jumlah;
         else kH[i] += t.jumlah;
       }
