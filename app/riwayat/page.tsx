@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { KerangkaBaris } from "@/components/kerangka";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   formatRupiah,
@@ -30,19 +31,30 @@ export default function Riwayat() {
   const [daftar, setDaftar] = useState<Transaksi[]>([]);
   const [notes, setNotes] = useState<Catatan[]>([]);
   const [hutang, setHutang] = useState<Hutang[]>([]);
+  const [memuat, setMemuat] = useState(true);
   const hariIni = tanggalHariIni();
 
   useEffect(() => {
+    let batal = false;
     (async () => {
-      const [d, n, h] = await Promise.all([getTransaksi(), muatSemuaCatatan(), getHutang()]);
-      setDaftar(
-        d
-          .slice()
-          .sort((a, b) => (a.tanggal < b.tanggal ? 1 : a.tanggal > b.tanggal ? -1 : b.id - a.id))
-      );
-      setNotes(n);
-      setHutang(h);
+      setMemuat(true);
+      try {
+        const [d, n, h] = await Promise.all([getTransaksi(), muatSemuaCatatan(), getHutang()]);
+        if (batal) return;
+        setDaftar(
+          d
+            .slice()
+            .sort((a, b) => (a.tanggal < b.tanggal ? 1 : a.tanggal > b.tanggal ? -1 : b.id - a.id))
+        );
+        setNotes(n);
+        setHutang(h);
+      } finally {
+        if (!batal) setMemuat(false);
+      }
     })();
+    return () => {
+      batal = true;
+    };
   }, []);
 
   return (
@@ -60,7 +72,9 @@ export default function Riwayat() {
           <Card>
             <CardHeader><CardTitle>Semua transaksi</CardTitle></CardHeader>
             <CardContent>
-              {daftar.length === 0 ? (
+              {memuat ? (
+                <KerangkaBaris jumlah={5} />
+              ) : daftar.length === 0 ? (
                 <p className="text-sm text-muted-foreground">Belum ada transaksi.</p>
               ) : (
                 <>
@@ -92,7 +106,9 @@ export default function Riwayat() {
           <Card>
             <CardHeader><CardTitle>Semua hutang & piutang</CardTitle></CardHeader>
             <CardContent>
-              {hutang.length === 0 ? (
+              {memuat ? (
+                <KerangkaBaris jumlah={4} />
+              ) : hutang.length === 0 ? (
                 <p className="text-sm text-muted-foreground">Belum ada hutang/piutang.</p>
               ) : (
                 <>

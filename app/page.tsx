@@ -8,6 +8,7 @@ import { BadgeKoneksi } from "@/components/badge-koneksi";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { NumberTicker } from "@/components/ui/number-ticker";
+import { KerangkaBaris, KerangkaKartu } from "@/components/kerangka";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   formatRupiah,
@@ -60,6 +61,7 @@ export default function Dashboard() {
   });
   // Pemicu gambar ulang grafik saat tema diganti (warna grid/tick baca .dark).
   const [revisiGrafik, setRevisiGrafik] = useState(0);
+  const [memuat, setMemuat] = useState(true);
   const refArus = useRef<HTMLCanvasElement>(null);
   const refMinggu = useRef<HTMLCanvasElement>(null);
   const refDonat = useRef<HTMLCanvasElement>(null);
@@ -68,23 +70,25 @@ export default function Dashboard() {
   useEffect(() => {
     let batal = false;
     (async () => {
-      const filter =
-        periode === "minggu"
-          ? { dari: awalMingguIni(), sampai: akhirMingguIni() }
-          : periode === "bulan"
-            ? { dari: awalBulanIni(), sampai: akhirBulanIni() }
-            : undefined;
-      const [s, k, daftar, n] = await Promise.all([
-        getSaldo(filter),
-        getRingkasanKategori(filter),
-        getTransaksi(),
-        muatSemuaCatatan(),
-      ]);
-      await segarkanCacheProduk();
-      if (batal) return;
-      setSaldo(s);
-      setKat(k);
-      setNotes(n);
+      setMemuat(true);
+      try {
+        const filter =
+          periode === "minggu"
+            ? { dari: awalMingguIni(), sampai: akhirMingguIni() }
+            : periode === "bulan"
+              ? { dari: awalBulanIni(), sampai: akhirBulanIni() }
+              : undefined;
+        const [s, k, daftar, n] = await Promise.all([
+          getSaldo(filter),
+          getRingkasanKategori(filter),
+          getTransaksi(),
+          muatSemuaCatatan(),
+        ]);
+        await segarkanCacheProduk();
+        if (batal) return;
+        setSaldo(s);
+        setKat(k);
+        setNotes(n);
       // Agregat mingguan: per nama hari dalam filter periode aktif.
       const mH = [0, 0, 0, 0, 0, 0, 0];
       const kH = [0, 0, 0, 0, 0, 0, 0];
@@ -101,6 +105,9 @@ export default function Dashboard() {
         .sort((a, b) => (a.tanggal < b.tanggal ? 1 : a.tanggal > b.tanggal ? -1 : b.id - a.id))
         .slice(0, 5);
       setRiwayat(urut);
+      } finally {
+        if (!batal) setMemuat(false);
+      }
     })();
     return () => {
       batal = true;
@@ -236,7 +243,9 @@ export default function Dashboard() {
       <Card>
         <CardHeader><CardTitle>Keluar per Kategori</CardTitle></CardHeader>
         <CardContent>
-          {kat.length === 0 ? (
+          {memuat ? (
+            <KerangkaBaris jumlah={3} />
+          ) : kat.length === 0 ? (
             <p className="text-sm text-muted-foreground">Belum ada pengeluaran pada periode ini.</p>
           ) : (
             <ul className="space-y-2">
@@ -253,7 +262,9 @@ export default function Dashboard() {
           )}
         </CardContent>
       </Card>
-      {saldo.masuk === 0 && saldo.keluar === 0 ? (
+      {memuat ? (
+        <KerangkaKartu baris={2} />
+      ) : saldo.masuk === 0 && saldo.keluar === 0 ? (
         <p className="text-sm text-muted-foreground">Silakan input data terlebih dahulu untuk menampilkan grafik.</p>
       ) : (
         <Card>
@@ -290,7 +301,9 @@ export default function Dashboard() {
       <Card>
         <CardHeader><CardTitle>Terakhir dicatat</CardTitle></CardHeader>
         <CardContent>
-          {riwayat.length === 0 ? (
+          {memuat ? (
+            <KerangkaBaris jumlah={5} />
+          ) : riwayat.length === 0 ? (
             <p className="text-sm text-muted-foreground">Belum ada transaksi.</p>
           ) : (
             <ul className="space-y-2">
