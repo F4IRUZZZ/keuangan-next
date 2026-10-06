@@ -14,6 +14,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { KerangkaBaris } from "@/components/kerangka";
 import {
   addProduk,
   deleteProduk,
@@ -36,14 +37,20 @@ export default function ProdukPage() {
   const [ubahKat, setUbahKat] = useState("");
   const [ubahPesan, setUbahPesan] = useState("");
   const [hapusId, setHapusId] = useState<number | null>(null);
+  const [memuat, setMemuat] = useState(true);
 
   async function muat() {
-    const p = await segarkanCacheProduk();
-    setDaftar(p);
-    const tx = await getTransaksi();
-    const hitung: Record<number, number> = {};
-    for (const t of tx) if (t.produkId != null) hitung[t.produkId] = (hitung[t.produkId] ?? 0) + 1;
-    setPakai(hitung);
+    setMemuat(true);
+    try {
+      const p = await segarkanCacheProduk();
+      setDaftar(p);
+      const tx = await getTransaksi();
+      const hitung: Record<number, number> = {};
+      for (const t of tx) if (t.produkId != null) hitung[t.produkId] = (hitung[t.produkId] ?? 0) + 1;
+      setPakai(hitung);
+    } finally {
+      setMemuat(false);
+    }
   }
 
   useEffect(() => {
@@ -153,7 +160,9 @@ export default function ProdukPage() {
         <Card>
           <CardHeader><CardTitle>Daftar kebutuhan</CardTitle></CardHeader>
           <CardContent>
-            {daftar.length === 0 ? (
+            {memuat ? (
+              <KerangkaBaris jumlah={4} />
+            ) : daftar.length === 0 ? (
               <p className="text-sm text-muted-foreground">Belum ada produk. Yuk tambah kebutuhan pertama di form.</p>
             ) : (
               <ul className="space-y-2">

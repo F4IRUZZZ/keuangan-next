@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { NumberTicker } from "@/components/ui/number-ticker";
+import { KerangkaBaris } from "@/components/kerangka";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   addCatatan,
@@ -83,25 +84,31 @@ function IsiTransaksi() {
   const [ubahPesan, setUbahPesan] = useState("");
   const [hapusId, setHapusId] = useState<number | null>(null);
   const [konfirmBulk, setKonfirmBulk] = useState(false);
+  const [memuat, setMemuat] = useState(true);
   const refCari = useRef<HTMLInputElement>(null);
 
   async function muat() {
-    const [d, n, prods, sb, sh] = await Promise.all([
-      getTransaksi(),
-      muatSemuaCatatan(),
-      segarkanCacheProduk(),
-      getSaldo({ dari: awalBulanIni(), sampai: akhirBulanIni() }),
-      getSaldo({ dari: tanggalHariIni(), sampai: tanggalHariIni() }),
-    ]);
-    setDaftar(d);
-    setNotes(n);
-    setSaldoBulan(sb);
-    setKeluarHari(sh.keluar);
-    setBatas(getBatasHarian());
-    const kat = new Set<string>();
-    prods.forEach((p) => kat.add(p.kategori));
-    d.forEach((t) => kat.add(kategoriOf(t)));
-    setSaran(Array.from(kat).sort());
+    setMemuat(true);
+    try {
+      const [d, n, prods, sb, sh] = await Promise.all([
+        getTransaksi(),
+        muatSemuaCatatan(),
+        segarkanCacheProduk(),
+        getSaldo({ dari: awalBulanIni(), sampai: akhirBulanIni() }),
+        getSaldo({ dari: tanggalHariIni(), sampai: tanggalHariIni() }),
+      ]);
+      setDaftar(d);
+      setNotes(n);
+      setSaldoBulan(sb);
+      setKeluarHari(sh.keluar);
+      setBatas(getBatasHarian());
+      const kat = new Set<string>();
+      prods.forEach((p) => kat.add(p.kategori));
+      d.forEach((t) => kat.add(kategoriOf(t)));
+      setSaran(Array.from(kat).sort());
+    } finally {
+      setMemuat(false);
+    }
   }
 
   useEffect(() => {
@@ -496,7 +503,9 @@ function IsiTransaksi() {
               <Button variant="destructive" size="sm" onClick={() => setKonfirmBulk(true)}>Hapus terpilih</Button>
             </div>
           )}
-          {urut.length === 0 ? (
+          {memuat ? (
+            <KerangkaBaris jumlah={5} />
+          ) : urut.length === 0 ? (
             <p className="text-sm text-muted-foreground">Belum ada transaksi yang cocok.</p>
           ) : (
             <ul className="space-y-2">

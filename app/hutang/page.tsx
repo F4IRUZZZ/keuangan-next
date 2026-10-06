@@ -14,6 +14,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { KerangkaBaris } from "@/components/kerangka";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   addHutang,
@@ -52,9 +53,15 @@ export default function HutangPage() {
   // Panel rincian cicilan (akordeon: 1 terbuka per saat)
   const [rincianId, setRincianId] = useState<number | null>(null);
   const [rincianRows, setRincianRows] = useState<Transaksi[]>([]);
+  const [memuat, setMemuat] = useState(true);
 
   async function muat() {
-    setDaftar(await getHutang());
+    setMemuat(true);
+    try {
+      setDaftar(await getHutang());
+    } finally {
+      setMemuat(false);
+    }
   }
 
   useEffect(() => {
@@ -251,7 +258,9 @@ export default function HutangPage() {
               <TabsTrigger value="piutang">Piutang</TabsTrigger>
             </TabsList>
           </Tabs>
-          {data.length === 0 ? (
+          {memuat ? (
+            <KerangkaBaris jumlah={4} />
+          ) : data.length === 0 ? (
             <p className="text-sm text-muted-foreground">Belum ada hutang/piutang.</p>
           ) : (
             <ul className="space-y-2">
