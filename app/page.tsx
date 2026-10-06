@@ -81,13 +81,16 @@ export default function Dashboard() {
             : periode === "bulan"
               ? { dari: awalBulanIni(), sampai: akhirBulanIni() }
               : undefined;
+        // Cache produk dulu: getRingkasanKategori baca cache global untuk
+        // transaksi berbasis produkId — paralel sebelumnya bisa jatuh ke "Lainnya".
+        await segarkanCacheProduk();
+        if (batal) return;
         const [s, k, daftar, n] = await Promise.all([
           getSaldo(filter),
           getRingkasanKategori(filter),
           getTransaksi(),
           muatSemuaCatatan(),
         ]);
-        await segarkanCacheProduk();
         if (batal) return;
         setSaldo(s);
         setKat(k);

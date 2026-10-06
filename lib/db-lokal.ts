@@ -799,7 +799,17 @@ export async function hapusSemuaData(): Promise<void> {
 }
 
 export function formatRupiah(n: number): string {
-  return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  if (!Number.isFinite(n)) return "0";
+  return String(Math.trunc(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
+// Baca input nominal teks: kembalikan digit + flag negatif agar pemanggil
+// bisa menolak eksplisit (jangan diam-diam ubah -5000 jadi +5000).
+export function bacaNominal(v: unknown): { nilai: number; negatif: boolean } {
+  const s = String(v ?? "");
+  const negatif = s.includes("-");
+  const digit = s.replace(/[^0-9]/g, "").slice(0, 15);
+  return { nilai: digit ? Number(digit) : 0, negatif };
 }
 
 // Tampil tanggal dd/mm/yyyy (display saja; simpan/banding/CSV tetap ISO).
