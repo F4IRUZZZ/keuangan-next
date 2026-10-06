@@ -132,7 +132,7 @@ export default function Riwayat() {
                           {h.jatuhTempo ? ` - tempo ${formatTanggal(h.jatuhTempo)}` : ""} - Sisa Rp{formatRupiah(sisa(h))} dari Rp{formatRupiah(h.jumlah)}
                         </p>
                         <div className="mt-2 h-2 overflow-hidden rounded-full bg-muted">
-                          <div className="h-full rounded-full bg-emerald-600" style={{ width: `${h.jumlah > 0 ? Math.round((h.dibayar / h.jumlah) * 100) : 0}%` }} />
+                          <div className="h-full rounded-full bg-emerald-600" style={{ width: `${h.jumlah > 0 ? Math.min(100, Math.max(0, Math.round((h.dibayar / h.jumlah) * 100))) : 0}%` }} />
                         </div>
                       </li>
                     ))}

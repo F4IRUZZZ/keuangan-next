@@ -8,20 +8,40 @@ export const EVENT_TEMA = "famvault-tema";
 
 export function bacaPilihan(): Tema {
   if (typeof window === "undefined") return "sistem";
-  const s = window.localStorage.getItem(KUNCI_TEMA);
-  return s === "terang" || s === "gelap" || s === "sistem" ? s : "sistem";
+  try {
+    const s = window.localStorage.getItem(KUNCI_TEMA);
+    return s === "terang" || s === "gelap" || s === "sistem" ? s : "sistem";
+  } catch {
+    return "sistem";
+  }
 }
 
 function gelapDari(p: Tema): boolean {
   if (p === "gelap") return true;
   if (p === "terang") return false;
-  return window.matchMedia("(prefers-color-scheme: dark)").matches;
+  try {
+    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+  } catch {
+    return false;
+  }
 }
 
 export function terapkanTema(p: Tema) {
-  document.documentElement.classList.toggle("dark", gelapDari(p));
-  window.localStorage.setItem(KUNCI_TEMA, p);
-  window.dispatchEvent(new CustomEvent<Tema>(EVENT_TEMA, { detail: p }));
+  try {
+    document.documentElement.classList.toggle("dark", gelapDari(p));
+  } catch {
+    /* DOM tak siap — abaikan */
+  }
+  try {
+    window.localStorage.setItem(KUNCI_TEMA, p);
+  } catch {
+    /* kuota penuh / mode privat — tema sesi ini tetap berlaku */
+  }
+  try {
+    window.dispatchEvent(new CustomEvent<Tema>(EVENT_TEMA, { detail: p }));
+  } catch {
+    /* abaikan */
+  }
 }
 
 // Mode sistem: bila OS ganti (mis. HP masuk mode malam), ikut tanpa reload.

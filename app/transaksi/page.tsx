@@ -24,6 +24,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   addCatatan,
   addTransaksi,
+  bacaNominal,
   deleteTransaksi,
   eksporCSV,
   formatRupiah,
@@ -142,7 +143,12 @@ function IsiTransaksi() {
 
   async function simpan(e: React.FormEvent) {
     e.preventDefault();
-    const jumlah = Number(String(nominal).replace(/[^0-9]/g, "")) || 0;
+    const { nilai: jumlah, negatif } = bacaNominal(nominal);
+    if (negatif) {
+      setPesan("Jumlah tidak boleh negatif (Rp).");
+      setPesanOk(false);
+      return;
+    }
     if (!(jumlah > 0)) {
       setPesan("Jumlah harus angka lebih dari 0 (Rp).");
       setPesanOk(false);
@@ -212,7 +218,11 @@ function IsiTransaksi() {
 
   async function simpanUbah() {
     if (ubahId === null) return;
-    const jumlah = Number(String(ubahJml).replace(/[^0-9]/g, "")) || 0;
+    const { nilai: jumlah, negatif } = bacaNominal(ubahJml);
+    if (negatif) {
+      setUbahPesan("Jumlah tidak boleh negatif (Rp).");
+      return;
+    }
     const alvo = daftar.find((t) => t.id === ubahId);
     const patch: { jumlah: number; tanggal: string; kategori?: string } = {
       jumlah,
@@ -230,7 +240,7 @@ function IsiTransaksi() {
         return;
       }
       setUbahId(null);
-      setPesan(`Transaksi diubah jadi Rp${formatRupiah(jumlah)}.`);
+      setPesan(`Transaksi diubah jadi Rp${formatRupiah(out.jumlah)}.`);
       setPesanOk(true);
       await muat();
     } catch {

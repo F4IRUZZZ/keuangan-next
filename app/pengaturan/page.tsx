@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { PemilihTema } from "@/components/pemilih-tema";
 import { APP_NAME, APP_VERSION } from "@/lib/app-info";
 import {
+  bacaNominal,
   formatRupiah,
   getBatasHarian,
   hapusSemuaData,
@@ -61,7 +62,11 @@ export default function PengaturanPage() {
   }, []);
 
   function simpanBatas() {
-    const v = Number(batasTeks.replace(/[^0-9]/g, "")) || 0;
+    const { nilai: v, negatif } = bacaNominal(batasTeks);
+    if (negatif) {
+      setHasil("Batas tidak boleh negatif (Rp).");
+      return;
+    }
     setBatasHarian(v);
     setHasil(v > 0 ? `Batas disimpan: Rp${formatRupiah(v)} per hari.` : "Kartu limit disembunyikan (batas 0).");
   }

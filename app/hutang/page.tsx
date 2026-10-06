@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { BadgeKoneksi } from "@/components/badge-koneksi";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,7 @@ import { KerangkaBaris } from "@/components/kerangka";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   addHutang,
+  bacaNominal,
   bayarHutang,
   deleteHutang,
   formatRupiah,
@@ -75,7 +76,12 @@ export default function HutangPage() {
 
   async function simpan(e: React.FormEvent) {
     e.preventDefault();
-    const jml = Number(String(jumlah).replace(/[^0-9]/g, "")) || 0;
+    const { nilai: jml, negatif } = bacaNominal(jumlah);
+    if (negatif) {
+      setPesan("Jumlah tidak boleh negatif (Rp).");
+      setPesanOk(false);
+      return;
+    }
     setMenyimpan(true);
     try {
       const res = await addHutang({
@@ -116,8 +122,11 @@ export default function HutangPage() {
 
   async function jalankanBayar() {
     if (bayarId === null) return;
-    console.log("DBG-JALANKAN-BAYAR id=" + bayarId);
-    const n = Number(String(bayarNom).replace(/[^0-9]/g, "")) || 0;
+    const { nilai: n, negatif } = bacaNominal(bayarNom);
+    if (negatif) {
+      setBayarPesan("Nominal tidak boleh negatif (Rp).");
+      return;
+    }
     try {
       const out = await bayarHutang(bayarId, n, bayarTgl || undefined);
       if ("error" in out) {
@@ -136,7 +145,7 @@ export default function HutangPage() {
   }
 
   async function jalankanLunas(id: number) {
-    console.log("DBG-JALANKAN-LUNAS id=" + id);
+
     try {
       const out = await lunaskanHutang(id);
       if ("error" in out) {
@@ -173,13 +182,18 @@ export default function HutangPage() {
     await muat();
   }
 
+  // Token anti-balapan: klik cepat antar-hutang tak boleh menimpa rows milik id lain.
+  const mintaRincian = useRef(0);
+
   async function toggleRincian(h: Hutang) {
     if (rincianId === h.id) {
       setRincianId(null);
       return;
     }
+    const tiket = ++mintaRincian.current;
     setRincianId(h.id);
-    setRincianRows(await getCicilan(h.id));
+    const rows = await getCicilan(h.id);
+    if (tiket === mintaRincian.current) setRincianRows(rows);
   }
 
   const data = daftar.filter((h) => tab === "semua" || h.arah === tab);
@@ -283,7 +297,7 @@ export default function HutangPage() {
                     {h.jatuhTempo ? ` - tempo ${formatTanggal(h.jatuhTempo)}` : ""} - Sisa Rp{formatRupiah(sisa(h))} dari Rp{formatRupiah(h.jumlah)}
                   </p>
                   <div className="mt-2 h-2 overflow-hidden rounded-full bg-muted">
-                    <div className="h-full rounded-full bg-emerald-600" style={{ width: `${h.jumlah > 0 ? Math.round((h.dibayar / h.jumlah) * 100) : 0}%` }} />
+                    <div className="h-full rounded-full bg-emerald-600" style={{ width: `${h.jumlah > 0 ? Math.min(100, Math.max(0, Math.round((h.dibayar / h.jumlah) * 100))) : 0}%` }} />
                   </div>
                   <div className="mt-2 flex flex-wrap gap-2">
                     {h.status === "belum" && (
