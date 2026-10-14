@@ -20,6 +20,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { NumberTicker } from "@/components/ui/number-ticker";
 import { KerangkaBaris } from "@/components/kerangka";
+import { BilahPersen, Kosong } from "@/components/kosong";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   addCatatan,
@@ -32,6 +33,7 @@ import {
   getBatasHarian,
   getSaldo,
   getTransaksi,
+  judulTransaksi,
   kategoriOf,
   muatSemuaCatatan,
   segarkanCacheProduk,
@@ -44,12 +46,6 @@ import {
   type Transaksi,
 } from "@/lib/db-lokal";
 import { akhirBulanIni, awalBulanIni } from "@/lib/periode";
-
-function judul(t: Transaksi, notes: Catatan[]): string {
-  const n = notes.find((c) => c.transaksiId === t.id);
-  if (n?.isi) return n.isi;
-  return `${t.jenis === "masuk" ? "Masuk" : "Keluar"} - ${kategoriOf(t)}`;
-}
 
 const CHIPS_TAMBAH = [10000, 50000, 100000, 500000];
 const CHIPS_TEMPEL = ["00", "000"];
@@ -338,7 +334,7 @@ function IsiTransaksi() {
             <CardContent>
               <form onSubmit={simpan} className="space-y-4">
                 <Tabs value={jenis} onValueChange={(v) => setJenis(v as Jenis)}>
-                  <TabsList id="tab-form" className="grid w-full grid-cols-2">
+                  <TabsList id="tab-form" aria-label="Pilih jenis transaksi" className="grid w-full grid-cols-2">
                     <TabsTrigger value="masuk">Masuk</TabsTrigger>
                     <TabsTrigger value="keluar">Keluar</TabsTrigger>
                   </TabsList>
@@ -421,9 +417,7 @@ function IsiTransaksi() {
                     Rp{formatRupiah(keluarHari)} / Rp{formatRupiah(batas)}
                   </span>
                 </div>
-                <div className="h-2 overflow-hidden rounded-full bg-muted">
-                  <div className="h-full rounded-full bg-emerald-600" style={{ width: `${persenLimit}%` }} />
-                </div>
+                <BilahPersen persen={persenLimit} className="w-full flex-none" />
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
                   <span>
                     {batas - keluarHari >= 0
@@ -439,7 +433,7 @@ function IsiTransaksi() {
 
         <section className="min-w-0 space-y-4">
           <Tabs value={tab} onValueChange={setTab}>
-            <TabsList id="tab-daftar">
+            <TabsList id="tab-daftar" aria-label="Saring daftar transaksi">
               <TabsTrigger value="semua">Semua ({dataPraTab.length})</TabsTrigger>
               <TabsTrigger value="masuk">Masuk ({nMasuk})</TabsTrigger>
               <TabsTrigger value="keluar">Keluar ({dataPraTab.length - nMasuk})</TabsTrigger>
@@ -499,6 +493,7 @@ function IsiTransaksi() {
           {!cariBuka ? null : (
             <Input
               ref={refCari}
+              aria-label="Cari transaksi"
               placeholder="Cari kategori / catatan / tanggal / nominal"
               value={cari}
               onChange={(e) => setCari(e.target.value)}
@@ -516,7 +511,7 @@ function IsiTransaksi() {
           {memuat ? (
             <KerangkaBaris jumlah={5} />
           ) : urut.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Belum ada transaksi yang cocok.</p>
+            <Kosong>Belum ada transaksi yang cocok.</Kosong>
           ) : (
             <ul className="space-y-2">
               {urut.map((t) => (
@@ -542,7 +537,7 @@ function IsiTransaksi() {
                           <Badge variant={t.jenis === "masuk" ? "default" : "destructive"}>
                             {t.jenis === "masuk" ? "MASUK" : "KELUAR"}
                           </Badge>
-                          <strong className="truncate">{judul(t, notes)}</strong>
+                          <strong className="truncate">{judulTransaksi(t, notes)}</strong>
                         </span>
                         <span className="block truncate text-xs text-muted-foreground">
                           {kategoriOf(t)} - {formatTanggal(t.tanggal)}
@@ -553,7 +548,7 @@ function IsiTransaksi() {
                       </strong>
                       <Button variant="ghost" size="icon" aria-label="Ubah" title="Ubah" onClick={() => bukaUbah(t)}><Pencil aria-hidden="true" /></Button>
                       <Button variant="ghost" size="icon" aria-label="Hapus" title="Hapus" onClick={() => setHapusId(t.id)}><Trash2 aria-hidden="true" /></Button>
-                      <DialogCatatan transaksiId={t.id} judul={judul(t, notes)} onBerubah={muat} />
+                      <DialogCatatan transaksiId={t.id} judul={judulTransaksi(t, notes)} onBerubah={muat} />
                     </CardContent>
                   </Card>
                 </li>

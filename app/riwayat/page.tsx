@@ -4,27 +4,22 @@ import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { KerangkaBaris } from "@/components/kerangka";
+import { BilahPersen, Kosong } from "@/components/kosong";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   formatRupiah,
   formatTanggal,
   getHutang,
   getTransaksi,
+  judulTransaksi,
   kategoriOf,
   muatSemuaCatatan,
+  sisaHutang,
   tanggalHariIni,
   type Catatan,
   type Hutang,
   type Transaksi,
 } from "@/lib/db-lokal";
-
-function judul(t: Transaksi, notes: Catatan[]): string {
-  const n = notes.find((c) => c.transaksiId === t.id);
-  if (n?.isi) return n.isi;
-  return `${t.jenis === "masuk" ? "Masuk" : "Keluar"} - ${kategoriOf(t)}`;
-}
-
-const sisa = (h: Hutang) => h.jumlah - h.dibayar;
 
 export default function Riwayat() {
   const [tab, setTab] = useState("transaksi");
@@ -75,7 +70,7 @@ export default function Riwayat() {
               {memuat ? (
                 <KerangkaBaris jumlah={5} />
               ) : daftar.length === 0 ? (
-                <p className="text-sm text-muted-foreground">Belum ada transaksi.</p>
+                <Kosong>Belum ada transaksi.</Kosong>
               ) : (
                 <>
                   <ul className="space-y-2">
@@ -85,7 +80,7 @@ export default function Riwayat() {
                           {t.jenis === "masuk" ? "MASUK" : "KELUAR"}
                         </Badge>
                         <span className="min-w-0 flex-1">
-                          <span className="block truncate">{judul(t, notes)}</span>
+                          <span className="block truncate">{judulTransaksi(t, notes)}</span>
                           <span className="block truncate text-xs text-muted-foreground">
                             {kategoriOf(t)} • {formatTanggal(t.tanggal)}
                           </span>
@@ -109,7 +104,7 @@ export default function Riwayat() {
               {memuat ? (
                 <KerangkaBaris jumlah={4} />
               ) : hutang.length === 0 ? (
-                <p className="text-sm text-muted-foreground">Belum ada hutang/piutang.</p>
+                <Kosong>Belum ada hutang/piutang.</Kosong>
               ) : (
                 <>
                   <ul className="space-y-2">
@@ -129,11 +124,12 @@ export default function Riwayat() {
                         </div>
                         <p className="text-xs text-muted-foreground">
                           {formatTanggal(h.tanggal)}
-                          {h.jatuhTempo ? ` - tempo ${formatTanggal(h.jatuhTempo)}` : ""} - Sisa Rp{formatRupiah(sisa(h))} dari Rp{formatRupiah(h.jumlah)}
+                          {h.jatuhTempo ? ` - tempo ${formatTanggal(h.jatuhTempo)}` : ""} - Sisa Rp{formatRupiah(sisaHutang(h))} dari Rp{formatRupiah(h.jumlah)}
                         </p>
-                        <div className="mt-2 h-2 overflow-hidden rounded-full bg-muted">
-                          <div className="h-full rounded-full bg-emerald-600" style={{ width: `${h.jumlah > 0 ? Math.min(100, Math.max(0, Math.round((h.dibayar / h.jumlah) * 100))) : 0}%` }} />
-                        </div>
+                        <BilahPersen
+                          persen={h.jumlah > 0 ? (h.dibayar / h.jumlah) * 100 : 0}
+                          className="mt-2 w-full flex-none"
+                        />
                       </li>
                     ))}
                   </ul>

@@ -344,6 +344,17 @@ export function kategoriOf(t: Transaksi): string {
   return "Lainnya";
 }
 
+// Judul baris transaksi: isi catatan bila ada, bila tidak "Masuk/Keluar - kategori".
+export function judulTransaksi(t: Transaksi, notes: Catatan[]): string {
+  const n = notes.find((c) => c.transaksiId === t.id);
+  if (n?.isi) return n.isi;
+  return `${t.jenis === "masuk" ? "Masuk" : "Keluar"} - ${kategoriOf(t)}`;
+}
+
+export function sisaHutang(h: Hutang): number {
+  return h.jumlah - h.dibayar;
+}
+
 export async function addProduk(nama: unknown, kategori: unknown): Promise<Hasil<Produk>> {
   const bersih = String(nama ?? "").trim();
   if (!bersih) return { error: "Nama produk wajib", code: 400 };

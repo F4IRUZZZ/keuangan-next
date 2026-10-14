@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Badge } from "@/components/ui/badge";
 import { BadgeKoneksi } from "@/components/badge-koneksi";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2 } from "lucide-react";
@@ -15,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { KerangkaBaris } from "@/components/kerangka";
+import { Kosong } from "@/components/kosong";
 import {
   addProduk,
   deleteProduk,
@@ -163,7 +163,7 @@ export default function ProdukPage() {
             {memuat ? (
               <KerangkaBaris jumlah={4} />
             ) : daftar.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Belum ada produk. Yuk tambah kebutuhan pertama di form.</p>
+              <Kosong>Belum ada produk. Yuk tambah kebutuhan pertama di form.</Kosong>
             ) : (
               <ul className="space-y-2">
                 {daftar.map((p) => (
