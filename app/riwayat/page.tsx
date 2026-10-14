@@ -67,7 +67,7 @@ export default function Riwayat() {
           <Card>
             <CardHeader><CardTitle>Semua transaksi</CardTitle></CardHeader>
             <CardContent>
-              {memuat ? (
+              {memuat && daftar.length === 0 ? (
                 <KerangkaBaris jumlah={5} />
               ) : daftar.length === 0 ? (
                 <Kosong>Belum ada transaksi.</Kosong>
@@ -101,7 +101,7 @@ export default function Riwayat() {
           <Card>
             <CardHeader><CardTitle>Semua hutang & piutang</CardTitle></CardHeader>
             <CardContent>
-              {memuat ? (
+              {memuat && hutang.length === 0 ? (
                 <KerangkaBaris jumlah={4} />
               ) : hutang.length === 0 ? (
                 <Kosong>Belum ada hutang/piutang.</Kosong>

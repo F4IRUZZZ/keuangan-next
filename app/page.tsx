@@ -302,7 +302,7 @@ export default function Dashboard() {
       <Card>
         <CardHeader><CardTitle>Terakhir dicatat</CardTitle></CardHeader>
         <CardContent>
-          {memuat ? (
+          {memuat && riwayat.length === 0 ? (
             <KerangkaBaris jumlah={5} />
           ) : riwayat.length === 0 ? (
             <Kosong>Belum ada transaksi.</Kosong>

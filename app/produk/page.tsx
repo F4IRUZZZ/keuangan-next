@@ -160,7 +160,7 @@ export default function ProdukPage() {
         <Card>
           <CardHeader><CardTitle>Daftar kebutuhan</CardTitle></CardHeader>
           <CardContent>
-            {memuat ? (
+            {memuat && daftar.length === 0 ? (
               <KerangkaBaris jumlah={4} />
             ) : daftar.length === 0 ? (
               <Kosong>Belum ada produk. Yuk tambah kebutuhan pertama di form.</Kosong>

@@ -273,7 +273,7 @@ export default function HutangPage() {
               <TabsTrigger value="piutang">Piutang</TabsTrigger>
             </TabsList>
           </Tabs>
-          {memuat ? (
+          {memuat && daftar.length === 0 ? (
             <KerangkaBaris jumlah={4} />
           ) : data.length === 0 ? (
             <Kosong>Belum ada hutang/piutang.</Kosong>
