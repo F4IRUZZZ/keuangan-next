@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { KerangkaBaris } from "@/components/kerangka";
+import { BilahPersen, Kosong } from "@/components/kosong";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   addHutang,
@@ -26,6 +27,7 @@ import {
   getCicilan,
   getHutang,
   lunaskanHutang,
+  sisaHutang,
   tanggalHariIni,
   type Arah,
   type Hutang,
@@ -197,9 +199,8 @@ export default function HutangPage() {
   }
 
   const data = daftar.filter((h) => tab === "semua" || h.arah === tab);
-  const sisa = (h: Hutang) => h.jumlah - h.dibayar;
-  const subHutang = data.filter((h) => h.arah === "hutang").reduce((s, h) => s + sisa(h), 0);
-  const subPiutang = data.filter((h) => h.arah === "piutang").reduce((s, h) => s + sisa(h), 0);
+  const subHutang = data.filter((h) => h.arah === "hutang").reduce((s, h) => s + sisaHutang(h), 0);
+  const subPiutang = data.filter((h) => h.arah === "piutang").reduce((s, h) => s + sisaHutang(h), 0);
   const hariIni = tanggalHariIni();
   const bayarH = daftar.find((h) => h.id === bayarId);
 
@@ -218,7 +219,7 @@ export default function HutangPage() {
           <CardContent>
             <form onSubmit={simpan} className="space-y-4">
               <Tabs value={arah} onValueChange={(v) => setArah(v as Arah)}>
-                <TabsList id="tab-arah" className="grid w-full grid-cols-2">
+                <TabsList id="tab-arah" aria-label="Pilih arah hutang atau piutang" className="grid w-full grid-cols-2">
                   <TabsTrigger value="hutang">Hutang</TabsTrigger>
                   <TabsTrigger value="piutang">Piutang</TabsTrigger>
                 </TabsList>
@@ -266,7 +267,7 @@ export default function HutangPage() {
 
         <section className="space-y-4">
           <Tabs value={tab} onValueChange={setTab}>
-            <TabsList id="tab-daftar-hutang">
+            <TabsList id="tab-daftar-hutang" aria-label="Saring daftar hutang">
               <TabsTrigger value="semua">Semua ({daftar.length})</TabsTrigger>
               <TabsTrigger value="hutang">Hutang</TabsTrigger>
               <TabsTrigger value="piutang">Piutang</TabsTrigger>
@@ -275,7 +276,7 @@ export default function HutangPage() {
           {memuat ? (
             <KerangkaBaris jumlah={4} />
           ) : data.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Belum ada hutang/piutang.</p>
+            <Kosong>Belum ada hutang/piutang.</Kosong>
           ) : (
             <ul className="space-y-2">
               {data.map((h) => (
@@ -294,11 +295,12 @@ export default function HutangPage() {
                   </div>
                   <p className="text-xs text-muted-foreground">
                     {formatTanggal(h.tanggal)}
-                    {h.jatuhTempo ? ` - tempo ${formatTanggal(h.jatuhTempo)}` : ""} - Sisa Rp{formatRupiah(sisa(h))} dari Rp{formatRupiah(h.jumlah)}
+                    {h.jatuhTempo ? ` - tempo ${formatTanggal(h.jatuhTempo)}` : ""} - Sisa Rp{formatRupiah(sisaHutang(h))} dari Rp{formatRupiah(h.jumlah)}
                   </p>
-                  <div className="mt-2 h-2 overflow-hidden rounded-full bg-muted">
-                    <div className="h-full rounded-full bg-emerald-600" style={{ width: `${h.jumlah > 0 ? Math.min(100, Math.max(0, Math.round((h.dibayar / h.jumlah) * 100))) : 0}%` }} />
-                  </div>
+                  <BilahPersen
+                    persen={h.jumlah > 0 ? (h.dibayar / h.jumlah) * 100 : 0}
+                    className="mt-2 w-full flex-none"
+                  />
                   <div className="mt-2 flex flex-wrap gap-2">
                     {h.status === "belum" && (
                       <>
@@ -334,7 +336,7 @@ export default function HutangPage() {
                               </p>
                             )}
                             {rincianRows.length === 0 && praFitur <= 0 ? (
-                              <p className="text-xs text-muted-foreground">Belum ada cicilan tercatat.</p>
+                              <Kosong className="text-xs">Belum ada cicilan tercatat.</Kosong>
                             ) : (
                               <ul className="space-y-1">
                                 {rincianRows.map((t) => {

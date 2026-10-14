@@ -9,6 +9,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { NumberTicker } from "@/components/ui/number-ticker";
 import { KerangkaBaris, KerangkaKartu } from "@/components/kerangka";
+import { BilahPersen, Kosong } from "@/components/kosong";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   formatRupiah,
@@ -16,6 +17,7 @@ import {
   getRingkasanKategori,
   getSaldo,
   getTransaksi,
+  judulTransaksi,
   kategoriOf,
   muatSemuaCatatan,
   segarkanCacheProduk,
@@ -43,12 +45,6 @@ function indeksHari(tanggal: string): number | null {
   const p = String(tanggal).split("-");
   const d = new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]));
   return (d.getDay() + 6) % 7;
-}
-
-function judul(t: Transaksi, notes: Catatan[]): string {
-  const n = notes.find((c) => c.transaksiId === t.id);
-  if (n?.isi) return n.isi;
-  return `${t.jenis === "masuk" ? "Masuk" : "Keluar"} - ${kategoriOf(t)}`;
 }
 
 export default function Dashboard() {
@@ -253,15 +249,13 @@ export default function Dashboard() {
           {memuat ? (
             <KerangkaBaris jumlah={3} />
           ) : kat.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Belum ada pengeluaran pada periode ini.</p>
+            <Kosong>Belum ada pengeluaran pada periode ini.</Kosong>
           ) : (
             <ul className="space-y-2">
               {kat.map((r) => (
                 <li key={r.kategori} className="flex items-center gap-3 text-sm">
                   <span className="w-24 shrink-0 truncate">{r.kategori}</span>
-                  <span className="h-2 min-w-0 flex-1 overflow-hidden rounded-full bg-muted" aria-hidden="true">
-                    <span className="block h-full rounded-full bg-emerald-600" style={{ width: `${r.persen}%` }} />
-                  </span>
+                  <BilahPersen persen={r.persen} />
                   <span className="shrink-0 tabular-nums">Rp{formatRupiah(r.total)} ({r.persen}%)</span>
                 </li>
               ))}
@@ -284,7 +278,7 @@ export default function Dashboard() {
               </TabsList>
               <TabsContent value="arus">
                 <div className="h-64">
-                  <canvas id="grafik-arus" ref={refArus} height={220} />
+                  <canvas id="grafik-arus" ref={refArus} height={220} role="img" aria-label="Grafik batang total pemasukan dan pengeluaran" />
                 </div>
               </TabsContent>
               <TabsContent value="minggu">
@@ -295,10 +289,10 @@ export default function Dashboard() {
               <TabsContent value="kategori">
                 {kat.length > 0 ? (
                   <div className="mx-auto h-64 w-full max-w-[560px]">
-                    <canvas id="grafik-kategori" ref={refDonat} height={220} />
+                    <canvas id="grafik-kategori" ref={refDonat} height={220} role="img" aria-label="Grafik donat pengeluaran per kategori" />
                   </div>
                 ) : (
-                  <p className="text-sm text-muted-foreground">Belum ada pengeluaran pada periode ini.</p>
+                  <Kosong>Belum ada pengeluaran pada periode ini.</Kosong>
                 )}
               </TabsContent>
             </Tabs>
@@ -311,7 +305,7 @@ export default function Dashboard() {
           {memuat ? (
             <KerangkaBaris jumlah={5} />
           ) : riwayat.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Belum ada transaksi.</p>
+            <Kosong>Belum ada transaksi.</Kosong>
           ) : (
             <ul className="space-y-2">
               {riwayat.map((t) => (
@@ -320,7 +314,7 @@ export default function Dashboard() {
                     {t.jenis === "masuk" ? "MASUK" : "KELUAR"}
                   </Badge>
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate">{judul(t, notes)}</span>
+                    <span className="block truncate">{judulTransaksi(t, notes)}</span>
                     <span className="block truncate text-xs text-muted-foreground">
                       {kategoriOf(t)} • {formatTanggal(t.tanggal)}
                     </span>

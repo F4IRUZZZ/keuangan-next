@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Kosong } from "@/components/kosong";
 import {
   addCatatan,
   deleteCatatan,
@@ -105,7 +106,7 @@ export function DialogCatatan({ transaksiId, judul, onBerubah }: Props) {
         </DialogHeader>
         <div className="space-y-3">
           {daftar.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Belum ada catatan.</p>
+            <Kosong>Belum ada catatan.</Kosong>
           ) : (
             <ul className="space-y-2">
               {daftar.map((c) => (

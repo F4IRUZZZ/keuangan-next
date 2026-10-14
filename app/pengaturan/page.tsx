@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Badge } from "@/components/ui/badge";
 import { BadgeKoneksi } from "@/components/badge-koneksi";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,12 +16,14 @@ import { PemilihTema } from "@/components/pemilih-tema";
 import { APP_NAME, APP_VERSION } from "@/lib/app-info";
 import {
   bacaNominal,
+  eksporCSV,
   formatRupiah,
   getBatasHarian,
   hapusSemuaData,
   imporBackup,
   setBatasHarian,
   tanggalHariIni,
+  unduhFile,
 } from "@/lib/db-lokal";
 
 async function bacaSemua() {
@@ -36,19 +37,6 @@ async function bacaSemua() {
     getHutang(),
   ]);
   return { produk, transaksi, catatan, hutang };
-}
-
-function unduh(nama: string, teks: string, tipe: string) {
-  const blob = new Blob([teks], { type: tipe });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = nama;
-  a.click();
-  URL.revokeObjectURL(a.href);
-}
-
-function selCSV(teks: unknown): string {
-  return `"${String(teks).replace(/"/g, '""')}"`;
 }
 
 export default function PengaturanPage() {
@@ -71,28 +59,14 @@ export default function PengaturanPage() {
     setHasil(v > 0 ? `Batas disimpan: Rp${formatRupiah(v)} per hari.` : "Kartu limit disembunyikan (batas 0).");
   }
 
-  async function eksporCSV() {
-    const { produk, transaksi, catatan } = await bacaSemua();
-    const katOf = (t: { kategori: string | null; produkId: number | null }) => {
-      if (t.kategori) return t.kategori;
-      const p = produk.find((x) => x.id === t.produkId);
-      return p ? p.kategori : "Lainnya";
-    };
-    const baris = ["tanggal,jenis,jumlah,kategori,catatan"];
-    for (const t of transaksi) {
-      const notes = catatan
-        .filter((c) => c.transaksiId === t.id)
-        .map((c) => c.isi)
-        .join("; ");
-      baris.push([selCSV(t.tanggal), selCSV(t.jenis), t.jumlah, selCSV(katOf(t)), selCSV(notes)].join(","));
-    }
-    unduh(`keuangan-${tanggalHariIni()}.csv`, baris.join("\r\n"), "text/csv");
+  async function unduhCSV() {
+    unduhFile(`keuangan-${tanggalHariIni()}.csv`, await eksporCSV(), "text/csv");
     setHasil("CSV diekspor.");
   }
 
   async function backup() {
     const semua = await bacaSemua();
-    unduh(
+    unduhFile(
       `keuangan-backup-${tanggalHariIni()}.json`,
       JSON.stringify({ dibackup: new Date().toISOString(), format: "keuangan-offline-v1", ...semua }, null, 2),
       "application/json"
@@ -140,7 +114,7 @@ export default function PengaturanPage() {
       </Card>
       <Card>
         <CardHeader><CardTitle>Ekspor Data</CardTitle></CardHeader>
-        <CardContent><Button onClick={eksporCSV}>Ekspor CSV</Button></CardContent>
+        <CardContent><Button onClick={unduhCSV}>Ekspor CSV</Button></CardContent>
       </Card>
       <Card>
         <CardHeader><CardTitle>Backup &amp; Restore</CardTitle></CardHeader>
