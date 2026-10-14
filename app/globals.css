@@ -140,3 +140,16 @@
     @apply font-sans;
   }
 }
+
+/* PR-2 mobile: target sentuh min 44px hanya di perangkat coarse-pointer.
+   Desktop tak berubah; aksi padat (icon-xs/sm) dikecualikan. */
+@media (pointer: coarse) {
+  [data-slot="button"]:not([data-size="icon-xs"]):not([data-size="icon-sm"]) {
+    min-height: 44px;
+  }
+  [data-slot="input"],
+  select,
+  textarea {
+    min-height: 44px;
+  }
+}
