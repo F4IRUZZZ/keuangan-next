@@ -508,7 +508,7 @@ function IsiTransaksi() {
               <Button variant="destructive" size="sm" onClick={() => setKonfirmBulk(true)}>Hapus terpilih</Button>
             </div>
           )}
-          {memuat ? (
+          {memuat && daftar.length === 0 ? (
             <KerangkaBaris jumlah={5} />
           ) : urut.length === 0 ? (
             <Kosong>Belum ada transaksi yang cocok.</Kosong>
