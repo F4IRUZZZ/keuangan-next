@@ -533,17 +533,17 @@ function IsiTransaksi() {
                         }}
                       />
                       <span className="min-w-0 flex-1">
-                        <span className="flex items-center gap-2">
+                        <span className="flex min-w-0 items-center gap-2">
                           <Badge variant={t.jenis === "masuk" ? "default" : "destructive"}>
                             {t.jenis === "masuk" ? "MASUK" : "KELUAR"}
                           </Badge>
-                          <strong className="truncate">{judulTransaksi(t, notes)}</strong>
+                          <strong className="min-w-0 truncate">{judulTransaksi(t, notes)}</strong>
                         </span>
                         <span className="block truncate text-xs text-muted-foreground">
                           {kategoriOf(t)} - {formatTanggal(t.tanggal)}
                         </span>
                       </span>
-                      <strong className={`whitespace-nowrap text-xl tabular-nums ${t.jenis === "masuk" ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"}`}>
+                      <strong className={`shrink-0 whitespace-nowrap text-xl tabular-nums ${t.jenis === "masuk" ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"}`}>
                         {t.jenis === "masuk" ? "+" : "-"}Rp{formatRupiah(t.jumlah)}
                       </strong>
                       <Button variant="ghost" size="icon" aria-label="Ubah" title="Ubah" onClick={() => bukaUbah(t)}><Pencil aria-hidden="true" /></Button>
