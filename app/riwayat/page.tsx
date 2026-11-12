@@ -75,7 +75,7 @@ export default function Riwayat() {
                 <>
                   <ul className="space-y-2">
                     {daftar.map((t) => (
-                      <li key={t.id} className="flex items-center gap-2 text-sm">
+                      <li key={t.id} className="flex min-w-0 items-center gap-2 text-sm">
                         <Badge variant={t.jenis === "masuk" ? "default" : "destructive"}>
                           {t.jenis === "masuk" ? "MASUK" : "KELUAR"}
                         </Badge>
@@ -85,7 +85,7 @@ export default function Riwayat() {
                             {kategoriOf(t)} • {formatTanggal(t.tanggal)}
                           </span>
                         </span>
-                        <strong className="tabular-nums">Rp{formatRupiah(t.jumlah)}</strong>
+                        <strong className="shrink-0 whitespace-nowrap tabular-nums">Rp{formatRupiah(t.jumlah)}</strong>
                       </li>
                     ))}
                   </ul>
